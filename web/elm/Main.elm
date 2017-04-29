@@ -26,9 +26,13 @@ item =
     { width = 90, height = 30 }
 
 
-main : Program Never Model Msg
+type alias ElmFlags =
+    { trackerToken : String }
+
+
+main : Program ElmFlags Model Msg
 main =
-    Html.program
+    Html.programWithFlags
         { init = init
         , view = view
         , update = update
@@ -96,8 +100,8 @@ type alias RequestParams =
     }
 
 
-init : ( Model, Cmd Msg )
-init =
+init : ElmFlags -> ( Model, Cmd Msg )
+init flags =
     let
         middleX =
             (board.width - item.width) // 2
@@ -115,7 +119,7 @@ init =
         ( { stories = stories
           , drag = Nothing
           , axisLock = Y
-          , settings = { projectId = "", label = "", token = "" }
+          , settings = { projectId = "", label = "", token = flags.trackerToken }
           , error = Nothing
           , focusedStory = Nothing
           , user = Nothing
@@ -334,7 +338,7 @@ view model =
             , Html.form [ onSubmit Go ] <|
                 [ input [ onInput <| Update ProjectId, placeholder "Project Id" ] []
                 , input [ onInput <| Update Label, placeholder "Label" ] []
-                , input [ onInput <| Update Token, placeholder "Token" ] []
+                , input [ onInput <| Update Token, placeholder "Token", value model.settings.token ] []
                 , input [ type_ "submit", onInput <| Update Token, placeholder "Token" ] []
                 ]
                     ++ [ h3 [ class "error" ]

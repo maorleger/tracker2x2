@@ -9644,6 +9644,9 @@ var _moarwick$elm_webpack_starter$Main$Size = F2(
 	function (a, b) {
 		return {width: a, height: b};
 	});
+var _moarwick$elm_webpack_starter$Main$ElmFlags = function (a) {
+	return {trackerToken: a};
+};
 var _moarwick$elm_webpack_starter$Main$User = F2(
 	function (a, b) {
 		return {trackerToken: a, userName: b};
@@ -9723,7 +9726,7 @@ var _moarwick$elm_webpack_starter$Main$RequestParams = F3(
 		return {projectId: a, label: b, token: c};
 	});
 var _moarwick$elm_webpack_starter$Main$Y = {ctor: 'Y'};
-var _moarwick$elm_webpack_starter$Main$init = function () {
+var _moarwick$elm_webpack_starter$Main$init = function (flags) {
 	var stories = {ctor: '[]'};
 	var setPosition = function (position) {
 		return A2(
@@ -9739,14 +9742,14 @@ var _moarwick$elm_webpack_starter$Main$init = function () {
 			stories: stories,
 			drag: _elm_lang$core$Maybe$Nothing,
 			axisLock: _moarwick$elm_webpack_starter$Main$Y,
-			settings: {projectId: '', label: '', token: ''},
+			settings: {projectId: '', label: '', token: flags.trackerToken},
 			error: _elm_lang$core$Maybe$Nothing,
 			focusedStory: _elm_lang$core$Maybe$Nothing,
 			user: _elm_lang$core$Maybe$Nothing
 		},
 		_1: _elm_lang$core$Platform_Cmd$none
 	};
-}();
+};
 var _moarwick$elm_webpack_starter$Main$X = {ctor: 'X'};
 var _moarwick$elm_webpack_starter$Main$getPosition = F3(
 	function (axisLock, drag, story) {
@@ -10144,7 +10147,11 @@ var _moarwick$elm_webpack_starter$Main$view = function (model) {
 											_1: {
 												ctor: '::',
 												_0: _elm_lang$html$Html_Attributes$placeholder('Token'),
-												_1: {ctor: '[]'}
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$value(model.settings.token),
+													_1: {ctor: '[]'}
+												}
 											}
 										},
 										{ctor: '[]'}),
@@ -10451,8 +10458,15 @@ var _moarwick$elm_webpack_starter$Main$view = function (model) {
 			}
 		});
 };
-var _moarwick$elm_webpack_starter$Main$main = _elm_lang$html$Html$program(
-	{init: _moarwick$elm_webpack_starter$Main$init, view: _moarwick$elm_webpack_starter$Main$view, update: _moarwick$elm_webpack_starter$Main$update, subscriptions: _moarwick$elm_webpack_starter$Main$subscriptions})();
+var _moarwick$elm_webpack_starter$Main$main = _elm_lang$html$Html$programWithFlags(
+	{init: _moarwick$elm_webpack_starter$Main$init, view: _moarwick$elm_webpack_starter$Main$view, update: _moarwick$elm_webpack_starter$Main$update, subscriptions: _moarwick$elm_webpack_starter$Main$subscriptions})(
+	A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (trackerToken) {
+			return _elm_lang$core$Json_Decode$succeed(
+				{trackerToken: trackerToken});
+		},
+		A2(_elm_lang$core$Json_Decode$field, 'trackerToken', _elm_lang$core$Json_Decode$string)));
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
