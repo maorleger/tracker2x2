@@ -9638,6 +9638,44 @@ var _moarwick$elm_webpack_starter$Main$toPosition = function (bp) {
 		_jschomay$elm_bounded_number$Number_Bounded$value(bp.x),
 		_jschomay$elm_bounded_number$Number_Bounded$value(bp.y));
 };
+var _moarwick$elm_webpack_starter$Main$labelDecoder = A2(
+	_elm_lang$core$Json_Decode$at,
+	{
+		ctor: '::',
+		_0: 'label',
+		_1: {
+			ctor: '::',
+			_0: 'name',
+			_1: {ctor: '[]'}
+		}
+	},
+	_elm_lang$core$Json_Decode$string);
+var _moarwick$elm_webpack_starter$Main$getAvailableLabels = function (_p2) {
+	var _p3 = _p2;
+	var labelsDecoder = _elm_lang$core$Json_Decode$list(_moarwick$elm_webpack_starter$Main$labelDecoder);
+	var epicsUrl = A2(
+		_elm_lang$core$Basics_ops['++'],
+		'https://www.pivotaltracker.com/services/v5/projects/',
+		A2(_elm_lang$core$Basics_ops['++'], _p3.projectId, '/epics'));
+	return _elm_lang$http$Http$request(
+		{
+			method: 'GET',
+			headers: {
+				ctor: '::',
+				_0: A2(_elm_lang$http$Http$header, 'Content-Type', 'application/json'),
+				_1: {
+					ctor: '::',
+					_0: A2(_elm_lang$http$Http$header, 'X-TrackerToken', _p3.token),
+					_1: {ctor: '[]'}
+				}
+			},
+			url: epicsUrl,
+			body: _elm_lang$http$Http$emptyBody,
+			expect: _elm_lang$http$Http$expectJson(labelsDecoder),
+			timeout: _elm_lang$core$Maybe$Nothing,
+			withCredentials: false
+		});
+};
 var _moarwick$elm_webpack_starter$Main$item = {width: 90, height: 30};
 var _moarwick$elm_webpack_starter$Main$board = {width: 650, height: 650};
 var _moarwick$elm_webpack_starter$Main$Size = F2(
@@ -9681,19 +9719,19 @@ var _moarwick$elm_webpack_starter$Main$storyDecoder = function () {
 			A2(_elm_lang$core$Json_Decode$field, 'description', _elm_lang$core$Json_Decode$string)),
 		A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$int));
 }();
-var _moarwick$elm_webpack_starter$Main$getStories = function (_p2) {
-	var _p3 = _p2;
+var _moarwick$elm_webpack_starter$Main$getStories = function (_p4) {
+	var _p5 = _p4;
 	var storiesDecoder = _elm_lang$core$Json_Decode$list(_moarwick$elm_webpack_starter$Main$storyDecoder);
 	var storiesUrl = A2(
 		_elm_lang$core$Basics_ops['++'],
 		'https://www.pivotaltracker.com/services/v5/projects/',
 		A2(
 			_elm_lang$core$Basics_ops['++'],
-			_p3.projectId,
+			_p5.projectId,
 			A2(
 				_elm_lang$core$Basics_ops['++'],
 				'/stories?with_label=',
-				A2(_elm_lang$core$Basics_ops['++'], _p3.label, '&fields=name,description'))));
+				A2(_elm_lang$core$Basics_ops['++'], _p5.label, '&fields=name,description'))));
 	return _elm_lang$http$Http$request(
 		{
 			method: 'GET',
@@ -9702,7 +9740,7 @@ var _moarwick$elm_webpack_starter$Main$getStories = function (_p2) {
 				_0: A2(_elm_lang$http$Http$header, 'Content-Type', 'application/json'),
 				_1: {
 					ctor: '::',
-					_0: A2(_elm_lang$http$Http$header, 'X-TrackerToken', _p3.token),
+					_0: A2(_elm_lang$http$Http$header, 'X-TrackerToken', _p5.token),
 					_1: {ctor: '[]'}
 				}
 			},
@@ -9713,9 +9751,9 @@ var _moarwick$elm_webpack_starter$Main$getStories = function (_p2) {
 			withCredentials: false
 		});
 };
-var _moarwick$elm_webpack_starter$Main$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {stories: a, drag: b, axisLock: c, settings: d, error: e, focusedStory: f, user: g};
+var _moarwick$elm_webpack_starter$Main$Model = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {stories: a, drag: b, axisLock: c, settings: d, error: e, focusedStory: f, user: g, epicLabels: h};
 	});
 var _moarwick$elm_webpack_starter$Main$Drag = F3(
 	function (a, b, c) {
@@ -9745,7 +9783,8 @@ var _moarwick$elm_webpack_starter$Main$init = function (flags) {
 			settings: {projectId: '', label: '', token: flags.trackerToken},
 			error: _elm_lang$core$Maybe$Nothing,
 			focusedStory: _elm_lang$core$Maybe$Nothing,
-			user: _elm_lang$core$Maybe$Nothing
+			user: _elm_lang$core$Maybe$Nothing,
+			epicLabels: {ctor: '[]'}
 		},
 		_1: _elm_lang$core$Platform_Cmd$none
 	};
@@ -9753,36 +9792,36 @@ var _moarwick$elm_webpack_starter$Main$init = function (flags) {
 var _moarwick$elm_webpack_starter$Main$X = {ctor: 'X'};
 var _moarwick$elm_webpack_starter$Main$getPosition = F3(
 	function (axisLock, drag, story) {
-		var yAxis = function (_p4) {
-			var _p5 = _p4;
+		var yAxis = function (_p6) {
+			var _p7 = _p6;
 			return _elm_lang$core$Native_Utils.eq(axisLock, _moarwick$elm_webpack_starter$Main$Y) ? A2(
 				_jschomay$elm_bounded_number$Number_Bounded$set,
-				(_jschomay$elm_bounded_number$Number_Bounded$value(story.position.y) + _p5.current.y) - _p5.start.y,
+				(_jschomay$elm_bounded_number$Number_Bounded$value(story.position.y) + _p7.current.y) - _p7.start.y,
 				story.position.y) : story.position.y;
 		};
-		var xAxis = function (_p6) {
-			var _p7 = _p6;
+		var xAxis = function (_p8) {
+			var _p9 = _p8;
 			return _elm_lang$core$Native_Utils.eq(axisLock, _moarwick$elm_webpack_starter$Main$X) ? A2(
 				_jschomay$elm_bounded_number$Number_Bounded$set,
-				(_jschomay$elm_bounded_number$Number_Bounded$value(story.position.x) + _p7.current.x) - _p7.start.x,
+				(_jschomay$elm_bounded_number$Number_Bounded$value(story.position.x) + _p9.current.x) - _p9.start.x,
 				story.position.x) : story.position.x;
 		};
-		var _p8 = drag;
-		if (_p8.ctor === 'Nothing') {
+		var _p10 = drag;
+		if (_p10.ctor === 'Nothing') {
 			return story.position;
 		} else {
-			var _p9 = _p8._0;
-			return _elm_lang$core$Native_Utils.eq(_p9.id, story.id) ? {
-				x: xAxis(_p9),
-				y: yAxis(_p9)
+			var _p11 = _p10._0;
+			return _elm_lang$core$Native_Utils.eq(_p11.id, story.id) ? {
+				x: xAxis(_p11),
+				y: yAxis(_p11)
 			} : story.position;
 		}
 	});
 var _moarwick$elm_webpack_starter$Main$updateStoryPosition = F3(
 	function (axisLock, maybeDrag, story) {
-		var _p10 = maybeDrag;
-		if (_p10.ctor === 'Just') {
-			return _elm_lang$core$Native_Utils.eq(_p10._0.id, story.id) ? _elm_lang$core$Native_Utils.update(
+		var _p12 = maybeDrag;
+		if (_p12.ctor === 'Just') {
+			return _elm_lang$core$Native_Utils.eq(_p12._0.id, story.id) ? _elm_lang$core$Native_Utils.update(
 				story,
 				{
 					position: A3(_moarwick$elm_webpack_starter$Main$getPosition, axisLock, maybeDrag, story)
@@ -9795,8 +9834,15 @@ var _moarwick$elm_webpack_starter$Main$Token = {ctor: 'Token'};
 var _moarwick$elm_webpack_starter$Main$Label = {ctor: 'Label'};
 var _moarwick$elm_webpack_starter$Main$ProjectId = {ctor: 'ProjectId'};
 var _moarwick$elm_webpack_starter$Main$Go = {ctor: 'Go'};
+var _moarwick$elm_webpack_starter$Main$EpicsResponse = function (a) {
+	return {ctor: 'EpicsResponse', _0: a};
+};
+var _moarwick$elm_webpack_starter$Main$FetchEpics = {ctor: 'FetchEpics'};
 var _moarwick$elm_webpack_starter$Main$ChangeAxis = function (a) {
 	return {ctor: 'ChangeAxis', _0: a};
+};
+var _moarwick$elm_webpack_starter$Main$ChangeEpic = function (a) {
+	return {ctor: 'ChangeEpic', _0: a};
 };
 var _moarwick$elm_webpack_starter$Main$Update = F2(
 	function (a, b) {
@@ -9807,8 +9853,8 @@ var _moarwick$elm_webpack_starter$Main$StoriesResponse = function (a) {
 };
 var _moarwick$elm_webpack_starter$Main$update = F2(
 	function (msg, model) {
-		var _p11 = msg;
-		switch (_p11.ctor) {
+		var _p13 = msg;
+		switch (_p13.ctor) {
 			case 'DragStart':
 				return {
 					ctor: '_Tuple2',
@@ -9830,8 +9876,8 @@ var _moarwick$elm_webpack_starter$Main$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'DragEnd':
-				var _p12 = model.drag;
-				if (_p12.ctor === 'Nothing') {
+				var _p14 = model.drag;
+				if (_p14.ctor === 'Nothing') {
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				} else {
 					return {
@@ -9857,16 +9903,16 @@ var _moarwick$elm_webpack_starter$Main$update = F2(
 							focusedStory: _elm_lang$core$List$head(
 								A2(
 									_elm_lang$core$List$filter,
-									function (_p13) {
+									function (_p15) {
 										return A2(
 											F2(
 												function (x, y) {
 													return _elm_lang$core$Native_Utils.eq(x, y);
 												}),
-											_p11._0,
+											_p13._0,
 											function (_) {
 												return _.id;
-											}(_p13));
+											}(_p15));
 									},
 									model.stories))
 						}),
@@ -9880,6 +9926,21 @@ var _moarwick$elm_webpack_starter$Main$update = F2(
 						{focusedStory: _elm_lang$core$Maybe$Nothing}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'ChangeEpic':
+				var settings = model.settings;
+				var newSettings = _elm_lang$core$Native_Utils.update(
+					settings,
+					{label: _p13._0});
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{settings: newSettings}),
+					_1: A2(
+						_elm_lang$http$Http$send,
+						_moarwick$elm_webpack_starter$Main$StoriesResponse,
+						_moarwick$elm_webpack_starter$Main$getStories(newSettings))
+				};
 			case 'Go':
 				return {
 					ctor: '_Tuple2',
@@ -9889,8 +9950,39 @@ var _moarwick$elm_webpack_starter$Main$update = F2(
 						_moarwick$elm_webpack_starter$Main$StoriesResponse,
 						_moarwick$elm_webpack_starter$Main$getStories(model.settings))
 				};
+			case 'FetchEpics':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: A2(
+						_elm_lang$http$Http$send,
+						_moarwick$elm_webpack_starter$Main$EpicsResponse,
+						_moarwick$elm_webpack_starter$Main$getAvailableLabels(model.settings))
+				};
+			case 'EpicsResponse':
+				var _p16 = _p13._0;
+				if (_p16.ctor === 'Err') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								error: _elm_lang$core$Maybe$Just(
+									_elm_lang$core$Basics$toString(_p16._0))
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{epicLabels: _p16._0}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				}
 			case 'Update':
-				switch (_p11._0.ctor) {
+				switch (_p13._0.ctor) {
 					case 'ProjectId':
 						var settings = model.settings;
 						return {
@@ -9900,7 +9992,7 @@ var _moarwick$elm_webpack_starter$Main$update = F2(
 								{
 									settings: _elm_lang$core$Native_Utils.update(
 										settings,
-										{projectId: _p11._1})
+										{projectId: _p13._1})
 								}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
@@ -9913,7 +10005,7 @@ var _moarwick$elm_webpack_starter$Main$update = F2(
 								{
 									settings: _elm_lang$core$Native_Utils.update(
 										settings,
-										{label: _p11._1})
+										{label: _p13._1})
 								}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
@@ -9926,7 +10018,7 @@ var _moarwick$elm_webpack_starter$Main$update = F2(
 								{
 									settings: _elm_lang$core$Native_Utils.update(
 										settings,
-										{token: _p11._1})
+										{token: _p13._1})
 								}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
@@ -9936,19 +10028,19 @@ var _moarwick$elm_webpack_starter$Main$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{axisLock: _p11._0}),
+						{axisLock: _p13._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
-				var _p14 = _p11._0;
-				if (_p14.ctor === 'Err') {
+				var _p17 = _p13._0;
+				if (_p17.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
 								error: _elm_lang$core$Maybe$Just(
-									_elm_lang$core$Basics$toString(_p14._0))
+									_elm_lang$core$Basics$toString(_p17._0))
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -9957,7 +10049,7 @@ var _moarwick$elm_webpack_starter$Main$update = F2(
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{stories: _p14._0, error: _elm_lang$core$Maybe$Nothing}),
+							{stories: _p17._0, error: _elm_lang$core$Maybe$Nothing}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
@@ -9990,8 +10082,8 @@ var _moarwick$elm_webpack_starter$Main$DragAt = function (a) {
 	return {ctor: 'DragAt', _0: a};
 };
 var _moarwick$elm_webpack_starter$Main$subscriptions = function (model) {
-	var _p15 = model.drag;
-	if (_p15.ctor === 'Nothing') {
+	var _p18 = model.drag;
+	if (_p18.ctor === 'Nothing') {
 		return _elm_lang$core$Platform_Sub$none;
 	} else {
 		return _elm_lang$core$Platform_Sub$batch(
@@ -10082,7 +10174,240 @@ var _moarwick$elm_webpack_starter$Main$itemView = F3(
 			});
 	});
 var _moarwick$elm_webpack_starter$Main$view = function (model) {
-	return _elm_lang$core$List$isEmpty(model.stories) ? A2(
+	var optionRenderer = function (labelText) {
+		return A2(
+			_elm_lang$html$Html$option,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$value(labelText),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(labelText),
+				_1: {ctor: '[]'}
+			});
+	};
+	var infoRenderer = {
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$h2,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Tracker 2x2'),
+				_1: {ctor: '[]'}
+			}),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$h3,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(model.settings.label),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('axis'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$label,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('axis__label'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$input,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$type_('radio'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$name('axis'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('axis__input'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(
+														_moarwick$elm_webpack_starter$Main$ChangeAxis(_moarwick$elm_webpack_starter$Main$Y)),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$checked(
+															_elm_lang$core$Native_Utils.eq(model.axisLock, _moarwick$elm_webpack_starter$Main$Y)),
+														_1: {ctor: '[]'}
+													}
+												}
+											}
+										}
+									},
+									{ctor: '[]'}),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Prioritize by importance'),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$label,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('axis__label'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$input,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$type_('radio'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$name('axis'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('axis__input'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onClick(
+															_moarwick$elm_webpack_starter$Main$ChangeAxis(_moarwick$elm_webpack_starter$Main$X)),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$checked(
+																_elm_lang$core$Native_Utils.eq(model.axisLock, _moarwick$elm_webpack_starter$Main$X)),
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										},
+										{ctor: '[]'}),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Prioritize by urgency'),
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('settings'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('settings__project'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$h3,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Select your project'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$input,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onInput(
+													_moarwick$elm_webpack_starter$Main$Update(_moarwick$elm_webpack_starter$Main$ProjectId)),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$placeholder('Project Id'),
+													_1: {ctor: '[]'}
+												}
+											},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$button,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(_moarwick$elm_webpack_starter$Main$FetchEpics),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('Fetch Epics'),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('settings__label'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$h3,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Select the epic'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$select,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onInput(_moarwick$elm_webpack_starter$Main$ChangeEpic),
+													_1: {ctor: '[]'}
+												},
+												A2(_elm_lang$core$List$map, optionRenderer, model.epicLabels)),
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		}
+	};
+	return _elm_lang$core$String$isEmpty(model.settings.token) ? A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		{
@@ -10092,47 +10417,46 @@ var _moarwick$elm_webpack_starter$Main$view = function (model) {
 				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('Enter your Tracker details'),
+					_0: _elm_lang$html$Html$text('Whoops! We don\'t have a tracker token for you'),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$form,
+					_elm_lang$html$Html$h3,
+					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onSubmit(_moarwick$elm_webpack_starter$Main$Go),
+						_0: _elm_lang$html$Html$text('Input it below. Don\'t worry, you will only have to do this once'),
 						_1: {ctor: '[]'}
-					},
-					A2(
-						_elm_lang$core$Basics_ops['++'],
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$form,
 						{
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$input,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onInput(
-										_moarwick$elm_webpack_starter$Main$Update(_moarwick$elm_webpack_starter$Main$ProjectId)),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$placeholder('Project Id'),
-										_1: {ctor: '[]'}
-									}
-								},
-								{ctor: '[]'}),
-							_1: {
+							_0: _elm_lang$html$Html_Events$onSubmit(_moarwick$elm_webpack_starter$Main$Go),
+							_1: {ctor: '[]'}
+						},
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							{
 								ctor: '::',
 								_0: A2(
 									_elm_lang$html$Html$input,
 									{
 										ctor: '::',
 										_0: _elm_lang$html$Html_Events$onInput(
-											_moarwick$elm_webpack_starter$Main$Update(_moarwick$elm_webpack_starter$Main$Label)),
+											_moarwick$elm_webpack_starter$Main$Update(_moarwick$elm_webpack_starter$Main$Token)),
 										_1: {
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$placeholder('Label'),
-											_1: {ctor: '[]'}
+											_0: _elm_lang$html$Html_Attributes$placeholder('Token'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$value(model.settings.token),
+												_1: {ctor: '[]'}
+											}
 										}
 									},
 									{ctor: '[]'}),
@@ -10142,61 +10466,41 @@ var _moarwick$elm_webpack_starter$Main$view = function (model) {
 										_elm_lang$html$Html$input,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onInput(
-												_moarwick$elm_webpack_starter$Main$Update(_moarwick$elm_webpack_starter$Main$Token)),
+											_0: _elm_lang$html$Html_Attributes$type_('submit'),
 											_1: {
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$placeholder('Token'),
+												_0: _elm_lang$html$Html_Events$onInput(
+													_moarwick$elm_webpack_starter$Main$Update(_moarwick$elm_webpack_starter$Main$Token)),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$value(model.settings.token),
+													_0: _elm_lang$html$Html_Attributes$placeholder('Token'),
 													_1: {ctor: '[]'}
 												}
 											}
 										},
 										{ctor: '[]'}),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$input,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$type_('submit'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onInput(
-														_moarwick$elm_webpack_starter$Main$Update(_moarwick$elm_webpack_starter$Main$Token)),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$placeholder('Token'),
-														_1: {ctor: '[]'}
-													}
-												}
-											},
-											{ctor: '[]'}),
-										_1: {ctor: '[]'}
-									}
+									_1: {ctor: '[]'}
 								}
-							}
-						},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$h3,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('error'),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(
-										A2(_elm_lang$core$Maybe$withDefault, '', model.error)),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						})),
-				_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$h3,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('error'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(
+											A2(_elm_lang$core$Maybe$withDefault, '', model.error)),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							})),
+					_1: {ctor: '[]'}
+				}
 			}
 		}) : A2(
 		_elm_lang$html$Html$div,
@@ -10216,128 +10520,7 @@ var _moarwick$elm_webpack_starter$Main$view = function (model) {
 				},
 				A2(
 					_elm_lang$core$Basics_ops['++'],
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$h2,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Tracker 2x2'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$h3,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(model.settings.label),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('axis'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$label,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('axis__label'),
-												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$input,
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$type_('radio'),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$name('axis'),
-															_1: {
-																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$class('axis__input'),
-																_1: {
-																	ctor: '::',
-																	_0: _elm_lang$html$Html_Events$onClick(
-																		_moarwick$elm_webpack_starter$Main$ChangeAxis(_moarwick$elm_webpack_starter$Main$Y)),
-																	_1: {
-																		ctor: '::',
-																		_0: _elm_lang$html$Html_Attributes$checked(
-																			_elm_lang$core$Native_Utils.eq(model.axisLock, _moarwick$elm_webpack_starter$Main$Y)),
-																		_1: {ctor: '[]'}
-																	}
-																}
-															}
-														}
-													},
-													{ctor: '[]'}),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('Prioritize by importance'),
-													_1: {ctor: '[]'}
-												}
-											}),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$label,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$class('axis__label'),
-													_1: {ctor: '[]'}
-												},
-												{
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$input,
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$type_('radio'),
-															_1: {
-																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$name('axis'),
-																_1: {
-																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$class('axis__input'),
-																	_1: {
-																		ctor: '::',
-																		_0: _elm_lang$html$Html_Events$onClick(
-																			_moarwick$elm_webpack_starter$Main$ChangeAxis(_moarwick$elm_webpack_starter$Main$X)),
-																		_1: {
-																			ctor: '::',
-																			_0: _elm_lang$html$Html_Attributes$checked(
-																				_elm_lang$core$Native_Utils.eq(model.axisLock, _moarwick$elm_webpack_starter$Main$X)),
-																			_1: {ctor: '[]'}
-																		}
-																	}
-																}
-															}
-														},
-														{ctor: '[]'}),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('Prioritize by urgency'),
-														_1: {ctor: '[]'}
-													}
-												}),
-											_1: {ctor: '[]'}
-										}
-									}),
-								_1: {ctor: '[]'}
-							}
-						}
-					},
+					infoRenderer,
 					A2(
 						_elm_lang$core$Maybe$withDefault,
 						{

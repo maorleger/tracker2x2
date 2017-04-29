@@ -83,6 +83,7 @@ type alias Model =
     , error : Maybe String
     , focusedStory : Maybe Story
     , user : Maybe User
+    , epicLabels : List String
     }
 
 
@@ -123,6 +124,7 @@ init flags =
           , error = Nothing
           , focusedStory = Nothing
           , user = Nothing
+          , epicLabels = []
           }
         , Cmd.none
         )
@@ -150,6 +152,34 @@ storyDecoder =
             (Decode.field "name" Decode.string)
             (Decode.maybe <| Decode.field "description" Decode.string)
             (Decode.field "id" Decode.int)
+
+
+labelDecoder : Decode.Decoder String
+labelDecoder =
+    Decode.at [ "label", "name" ] Decode.string
+
+
+getAvailableLabels : RequestParams -> Http.Request (List String)
+getAvailableLabels { projectId, label, token } =
+    let
+        epicsUrl =
+            "https://www.pivotaltracker.com/services/v5/projects/" ++ projectId ++ "/epics"
+
+        labelsDecoder =
+            (Decode.list labelDecoder)
+    in
+        Http.request
+            { method = "GET"
+            , headers =
+                [ Http.header "Content-Type" "application/json"
+                , Http.header "X-TrackerToken" token
+                ]
+            , url = epicsUrl
+            , body = Http.emptyBody
+            , expect = Http.expectJson labelsDecoder
+            , timeout = Nothing
+            , withCredentials = False
+            }
 
 
 getStories : RequestParams -> Http.Request (List Story)
@@ -192,7 +222,10 @@ type Msg
     | MouseLeave Int
     | StoriesResponse (Result Http.Error (List Story))
     | Update Fields String
+    | ChangeEpic String
     | ChangeAxis Axis
+    | FetchEpics
+    | EpicsResponse (Result Http.Error (List String))
     | Go
 
 
@@ -233,6 +266,16 @@ update msg model =
         MouseLeave id ->
             ( { model | focusedStory = Nothing }, Cmd.none )
 
+        ChangeEpic newEpicLabel ->
+            let
+                settings =
+                    model.settings
+
+                newSettings =
+                    { settings | label = newEpicLabel }
+            in
+                ( { model | settings = newSettings }, Http.send StoriesResponse (getStories newSettings) )
+
         Go ->
             ( model, Http.send StoriesResponse (getStories model.settings) )
 
@@ -244,6 +287,19 @@ update msg model =
                 ( { model | settings = { settings | projectId = value } }
                 , Cmd.none
                 )
+
+        FetchEpics ->
+            ( model
+            , Http.send EpicsResponse (getAvailableLabels model.settings)
+            )
+
+        EpicsResponse result ->
+            case result of
+                Err error ->
+                    ( { model | error = Just <| toString error }, Cmd.none )
+
+                Ok epicLabels ->
+                    ( { model | epicLabels = epicLabels }, Cmd.none )
 
         Update Label value ->
             let
@@ -332,75 +388,98 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    if List.isEmpty model.stories then
-        div []
-            [ h1 [] [ text "Enter your Tracker details" ]
-            , Html.form [ onSubmit Go ] <|
-                [ input [ onInput <| Update ProjectId, placeholder "Project Id" ] []
-                , input [ onInput <| Update Label, placeholder "Label" ] []
-                , input [ onInput <| Update Token, placeholder "Token", value model.settings.token ] []
-                , input [ type_ "submit", onInput <| Update Token, placeholder "Token" ] []
-                ]
-                    ++ [ h3 [ class "error" ]
-                            [ text <|
-                                (Maybe.withDefault "" model.error)
-                            ]
-                       ]
-            ]
-    else
-        div [ class "container" ]
-            [ div [ class "info" ] <|
-                [ h2 [] [ text "Tracker 2x2" ]
-                , h3 [] [ text model.settings.label ]
-                , div [ class "axis" ]
-                    [ label [ class "axis__label" ]
-                        [ input
-                            [ type_ "radio"
-                            , name "axis"
-                            , class "axis__input"
-                            , onClick <| ChangeAxis Y
-                            , checked <| model.axisLock == Y
-                            ]
-                            []
-                        , text "Prioritize by importance"
+    let
+        optionRenderer labelText =
+            option [ value labelText ] [ text labelText ]
+
+        infoRenderer =
+            [ h2 [] [ text "Tracker 2x2" ]
+            , h3 [] [ text model.settings.label ]
+            , div [ class "axis" ]
+                [ label [ class "axis__label" ]
+                    [ input
+                        [ type_ "radio"
+                        , name "axis"
+                        , class "axis__input"
+                        , onClick <| ChangeAxis Y
+                        , checked <| model.axisLock == Y
                         ]
-                    , label [ class "axis__label" ]
-                        [ input
-                            [ type_ "radio"
-                            , name "axis"
-                            , class "axis__input"
-                            , onClick <| ChangeAxis X
-                            , checked <| model.axisLock == X
-                            ]
-                            []
-                        , text "Prioritize by urgency"
+                        []
+                    , text "Prioritize by importance"
+                    ]
+                , label [ class "axis__label" ]
+                    [ input
+                        [ type_ "radio"
+                        , name "axis"
+                        , class "axis__input"
+                        , onClick <| ChangeAxis X
+                        , checked <| model.axisLock == X
                         ]
+                        []
+                    , text "Prioritize by urgency"
                     ]
                 ]
-                    ++ (Maybe.map
-                            (\story ->
-                                [ div [ class "story_details" ]
-                                    [ h4 [ class "story_details__title" ] [ text story.title ]
-                                    , toHtml [ class "story_details__description" ] (Maybe.withDefault "(no description)" story.description)
-                                    ]
+            , div [ class "settings" ]
+                [ div [ class "settings__project" ]
+                    [ h3 [] [ text "Select your project" ]
+                    , input
+                        [ onInput <| Update ProjectId
+                        , placeholder "Project Id"
+                        ]
+                        []
+                    , button [ onClick FetchEpics ] [ text "Fetch Epics" ]
+                    ]
+                , div [ class "settings__label" ]
+                    [ h3 []
+                        [ text "Select the epic"
+                        ]
+                    , select [ onInput ChangeEpic ] <| List.map optionRenderer model.epicLabels
+                    ]
+                ]
+            ]
+    in
+        if String.isEmpty model.settings.token then
+            div []
+                [ h1 [] [ text "Whoops! We don't have a tracker token for you" ]
+                , h3 [] [ text "Input it below. Don't worry, you will only have to do this once" ]
+                , Html.form [ onSubmit Go ] <|
+                    [ input [ onInput <| Update Token, placeholder "Token", value model.settings.token ] []
+                    , input [ type_ "submit", onInput <| Update Token, placeholder "Token" ] []
+                    ]
+                        ++ [ h3 [ class "error" ]
+                                [ text <|
+                                    (Maybe.withDefault "" model.error)
                                 ]
-                            )
-                            model.focusedStory
-                            |> Maybe.withDefault [ div [ class "story_details story_details--empty" ] [] ]
-                       )
-            , div
-                [ class "board"
-                , style
-                    [ ( "width", px board.width )
-                    , ( "height", px board.height )
+                           ]
+                ]
+        else
+            div [ class "container" ]
+                [ div [ class "info" ] <|
+                    infoRenderer
+                        ++ (Maybe.map
+                                (\story ->
+                                    [ div [ class "story_details" ]
+                                        [ h4 [ class "story_details__title" ] [ text story.title ]
+                                        , toHtml [ class "story_details__description" ] (Maybe.withDefault "(no description)" story.description)
+                                        ]
+                                    ]
+                                )
+                                model.focusedStory
+                                |> Maybe.withDefault [ div [ class "story_details story_details--empty" ] [] ]
+                           )
+                , div
+                    [ class "board"
+                    , style
+                        [ ( "width", px board.width )
+                        , ( "height", px board.height )
+                        ]
                     ]
+                  <|
+                    [ div [ class "board__axis board__axis--y" ] []
+                    , div [ class "board__axis board__axis--x" ] []
+                    ]
+                        ++ List.map (itemView model.axisLock model.drag) model.stories
                 ]
-              <|
-                [ div [ class "board__axis board__axis--y" ] []
-                , div [ class "board__axis board__axis--x" ] []
-                ]
-                    ++ List.map (itemView model.axisLock model.drag) model.stories
-            ]
 
 
 itemView : Axis -> Maybe Drag -> Story -> Html Msg

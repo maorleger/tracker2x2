@@ -1,1 +1,2 @@
 <div id="main"></div>
+<script>window.trackerToken = "<%= @user.token %>"</script>

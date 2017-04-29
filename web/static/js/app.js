@@ -21,6 +21,6 @@ import "phoenix_html"
 // import socket from "./socket"
 import Elm from './main';
 var elmFlags = {
-  trackerToken: 'SomeToken'
+  trackerToken: trackerToken
 };
 Elm.Main.embed(document.getElementById('main'), elmFlags);
