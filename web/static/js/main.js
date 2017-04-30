@@ -9638,6 +9638,41 @@ var _moarwick$elm_webpack_starter$Main$toPosition = function (bp) {
 		_jschomay$elm_bounded_number$Number_Bounded$value(bp.x),
 		_jschomay$elm_bounded_number$Number_Bounded$value(bp.y));
 };
+var _moarwick$elm_webpack_starter$Main$updateToken = F2(
+	function (userId, token) {
+		var body = _elm_lang$http$Http$jsonBody(
+			_elm_lang$core$Json_Encode$object(
+				{
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'user_id',
+						_1: _elm_lang$core$Json_Encode$int(userId)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'token',
+							_1: _elm_lang$core$Json_Encode$string(token)
+						},
+						_1: {ctor: '[]'}
+					}
+				}));
+		var apiDecoder = _elm_lang$core$Json_Decode$succeed(
+			{ctor: '_Tuple0'});
+		var apiUrl = '/api/token';
+		return _elm_lang$http$Http$request(
+			{
+				method: 'POST',
+				headers: {ctor: '[]'},
+				url: apiUrl,
+				body: body,
+				expect: _elm_lang$http$Http$expectJson(apiDecoder),
+				timeout: _elm_lang$core$Maybe$Nothing,
+				withCredentials: false
+			});
+	});
 var _moarwick$elm_webpack_starter$Main$labelDecoder = A2(
 	_elm_lang$core$Json_Decode$at,
 	{
@@ -9682,9 +9717,10 @@ var _moarwick$elm_webpack_starter$Main$Size = F2(
 	function (a, b) {
 		return {width: a, height: b};
 	});
-var _moarwick$elm_webpack_starter$Main$ElmFlags = function (a) {
-	return {trackerToken: a};
-};
+var _moarwick$elm_webpack_starter$Main$ElmFlags = F2(
+	function (a, b) {
+		return {userId: a, trackerToken: b};
+	});
 var _moarwick$elm_webpack_starter$Main$User = F2(
 	function (a, b) {
 		return {trackerToken: a, userName: b};
@@ -9751,17 +9787,17 @@ var _moarwick$elm_webpack_starter$Main$getStories = function (_p4) {
 			withCredentials: false
 		});
 };
-var _moarwick$elm_webpack_starter$Main$Model = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {stories: a, drag: b, axisLock: c, settings: d, error: e, focusedStory: f, user: g, epicLabels: h};
+var _moarwick$elm_webpack_starter$Main$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {stories: a, drag: b, axisLock: c, settings: d, error: e, focusedStory: f, epicLabels: g};
 	});
 var _moarwick$elm_webpack_starter$Main$Drag = F3(
 	function (a, b, c) {
 		return {id: a, start: b, current: c};
 	});
-var _moarwick$elm_webpack_starter$Main$RequestParams = F3(
-	function (a, b, c) {
-		return {projectId: a, label: b, token: c};
+var _moarwick$elm_webpack_starter$Main$RequestParams = F5(
+	function (a, b, c, d, e) {
+		return {projectId: a, label: b, token: c, editingToken: d, userId: e};
 	});
 var _moarwick$elm_webpack_starter$Main$Y = {ctor: 'Y'};
 var _moarwick$elm_webpack_starter$Main$init = function (flags) {
@@ -9780,10 +9816,9 @@ var _moarwick$elm_webpack_starter$Main$init = function (flags) {
 			stories: stories,
 			drag: _elm_lang$core$Maybe$Nothing,
 			axisLock: _moarwick$elm_webpack_starter$Main$Y,
-			settings: {projectId: '', label: '', token: flags.trackerToken},
+			settings: {projectId: '', label: '', token: flags.trackerToken, editingToken: flags.trackerToken, userId: flags.userId},
 			error: _elm_lang$core$Maybe$Nothing,
 			focusedStory: _elm_lang$core$Maybe$Nothing,
-			user: _elm_lang$core$Maybe$Nothing,
 			epicLabels: {ctor: '[]'}
 		},
 		_1: _elm_lang$core$Platform_Cmd$none
@@ -9844,6 +9879,10 @@ var _moarwick$elm_webpack_starter$Main$ChangeAxis = function (a) {
 var _moarwick$elm_webpack_starter$Main$ChangeEpic = function (a) {
 	return {ctor: 'ChangeEpic', _0: a};
 };
+var _moarwick$elm_webpack_starter$Main$TokenResponse = function (a) {
+	return {ctor: 'TokenResponse', _0: a};
+};
+var _moarwick$elm_webpack_starter$Main$SaveAndSetToken = {ctor: 'SaveAndSetToken'};
 var _moarwick$elm_webpack_starter$Main$Update = F2(
 	function (a, b) {
 		return {ctor: 'Update', _0: a, _1: b};
@@ -9950,6 +9989,25 @@ var _moarwick$elm_webpack_starter$Main$update = F2(
 						_moarwick$elm_webpack_starter$Main$StoriesResponse,
 						_moarwick$elm_webpack_starter$Main$getStories(model.settings))
 				};
+			case 'TokenResponse':
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'SaveAndSetToken':
+				var settings = model.settings;
+				var tokenRequest = 1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							settings: _elm_lang$core$Native_Utils.update(
+								settings,
+								{token: settings.editingToken})
+						}),
+					_1: A2(
+						_elm_lang$http$Http$send,
+						_moarwick$elm_webpack_starter$Main$TokenResponse,
+						A2(_moarwick$elm_webpack_starter$Main$updateToken, settings.userId, settings.editingToken))
+				};
 			case 'FetchEpics':
 				return {
 					ctor: '_Tuple2',
@@ -10018,7 +10076,7 @@ var _moarwick$elm_webpack_starter$Main$update = F2(
 								{
 									settings: _elm_lang$core$Native_Utils.update(
 										settings,
-										{token: _p13._1})
+										{editingToken: _p13._1})
 								}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
@@ -10436,7 +10494,7 @@ var _moarwick$elm_webpack_starter$Main$view = function (model) {
 						_elm_lang$html$Html$form,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onSubmit(_moarwick$elm_webpack_starter$Main$Go),
+							_0: _elm_lang$html$Html_Events$onSubmit(_moarwick$elm_webpack_starter$Main$SaveAndSetToken),
 							_1: {ctor: '[]'}
 						},
 						A2(
@@ -10454,7 +10512,7 @@ var _moarwick$elm_webpack_starter$Main$view = function (model) {
 											_0: _elm_lang$html$Html_Attributes$placeholder('Token'),
 											_1: {
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$value(model.settings.token),
+												_0: _elm_lang$html$Html_Attributes$value(model.settings.editingToken),
 												_1: {ctor: '[]'}
 											}
 										}
@@ -10467,16 +10525,7 @@ var _moarwick$elm_webpack_starter$Main$view = function (model) {
 										{
 											ctor: '::',
 											_0: _elm_lang$html$Html_Attributes$type_('submit'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onInput(
-													_moarwick$elm_webpack_starter$Main$Update(_moarwick$elm_webpack_starter$Main$Token)),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$placeholder('Token'),
-													_1: {ctor: '[]'}
-												}
-											}
+											_1: {ctor: '[]'}
 										},
 										{ctor: '[]'}),
 									_1: {ctor: '[]'}
@@ -10646,8 +10695,13 @@ var _moarwick$elm_webpack_starter$Main$main = _elm_lang$html$Html$programWithFla
 	A2(
 		_elm_lang$core$Json_Decode$andThen,
 		function (trackerToken) {
-			return _elm_lang$core$Json_Decode$succeed(
-				{trackerToken: trackerToken});
+			return A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (userId) {
+					return _elm_lang$core$Json_Decode$succeed(
+						{trackerToken: trackerToken, userId: userId});
+				},
+				A2(_elm_lang$core$Json_Decode$field, 'userId', _elm_lang$core$Json_Decode$int));
 		},
 		A2(_elm_lang$core$Json_Decode$field, 'trackerToken', _elm_lang$core$Json_Decode$string)));
 

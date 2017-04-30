@@ -5,6 +5,7 @@ import Markdown exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as Decode
+import Json.Encode as Encode
 import Mouse exposing (Position)
 import Number.Bounded as Bounded exposing (Bounded)
 import Http
@@ -27,7 +28,9 @@ item =
 
 
 type alias ElmFlags =
-    { trackerToken : String }
+    { userId : Int
+    , trackerToken : String
+    }
 
 
 main : Program ElmFlags Model Msg
@@ -82,7 +85,6 @@ type alias Model =
     , settings : RequestParams
     , error : Maybe String
     , focusedStory : Maybe Story
-    , user : Maybe User
     , epicLabels : List String
     }
 
@@ -98,6 +100,8 @@ type alias RequestParams =
     { projectId : String
     , label : String
     , token : String
+    , editingToken : String
+    , userId : Int
     }
 
 
@@ -120,10 +124,9 @@ init flags =
         ( { stories = stories
           , drag = Nothing
           , axisLock = Y
-          , settings = { projectId = "", label = "", token = flags.trackerToken }
+          , settings = { projectId = "", label = "", token = flags.trackerToken, editingToken = flags.trackerToken, userId = flags.userId }
           , error = Nothing
           , focusedStory = Nothing
-          , user = Nothing
           , epicLabels = []
           }
         , Cmd.none
@@ -205,6 +208,32 @@ getStories { projectId, label, token } =
             }
 
 
+updateToken : Int -> String -> Http.Request ()
+updateToken userId token =
+    let
+        apiUrl =
+            "/api/token"
+
+        apiDecoder =
+            Decode.succeed ()
+
+        body =
+            Http.jsonBody <|
+                Encode.object [ ( "user_id", Encode.int userId ), ( "token", Encode.string token ) ]
+    in
+        Http.request
+            { method =
+                "POST"
+                -- , headers = [ Http.header "Content-Type" "application/json" ]
+            , headers = []
+            , url = apiUrl
+            , body = body
+            , expect = Http.expectJson apiDecoder
+            , timeout = Nothing
+            , withCredentials = False
+            }
+
+
 toPosition : BoundedPosition -> Position
 toPosition bp =
     Position (Bounded.value bp.x) (Bounded.value bp.y)
@@ -222,6 +251,8 @@ type Msg
     | MouseLeave Int
     | StoriesResponse (Result Http.Error (List Story))
     | Update Fields String
+    | SaveAndSetToken
+    | TokenResponse (Result Http.Error ())
     | ChangeEpic String
     | ChangeAxis Axis
     | FetchEpics
@@ -279,6 +310,19 @@ update msg model =
         Go ->
             ( model, Http.send StoriesResponse (getStories model.settings) )
 
+        TokenResponse res ->
+            ( model, Cmd.none )
+
+        SaveAndSetToken ->
+            let
+                tokenRequest =
+                    1
+
+                settings =
+                    model.settings
+            in
+                ( { model | settings = { settings | token = settings.editingToken } }, Http.send TokenResponse (updateToken settings.userId settings.editingToken) )
+
         Update ProjectId value ->
             let
                 settings =
@@ -315,7 +359,7 @@ update msg model =
                 settings =
                     model.settings
             in
-                ( { model | settings = { settings | token = value } }
+                ( { model | settings = { settings | editingToken = value } }
                 , Cmd.none
                 )
 
@@ -442,9 +486,9 @@ view model =
             div []
                 [ h1 [] [ text "Whoops! We don't have a tracker token for you" ]
                 , h3 [] [ text "Input it below. Don't worry, you will only have to do this once" ]
-                , Html.form [ onSubmit Go ] <|
-                    [ input [ onInput <| Update Token, placeholder "Token", value model.settings.token ] []
-                    , input [ type_ "submit", onInput <| Update Token, placeholder "Token" ] []
+                , Html.form [ onSubmit SaveAndSetToken ] <|
+                    [ input [ onInput <| Update Token, placeholder "Token", value model.settings.editingToken ] []
+                    , input [ type_ "submit" ] []
                     ]
                         ++ [ h3 [ class "error" ]
                                 [ text <|
