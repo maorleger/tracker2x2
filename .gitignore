@@ -28,3 +28,6 @@ elm-stuff/
 node_modules/
 tmp/
 dist/
+
+# generated elm file
+web/static/js/main.js
