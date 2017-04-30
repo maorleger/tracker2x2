@@ -1,8 +1,10 @@
 defmodule Tracker2x2.UserSocket do
   use Phoenix.Socket
+  require Logger
 
   ## Channels
   # channel "room:*", Tracker2x2.RoomChannel
+  channel "room:*", Tracker2x2.RoomChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -20,6 +22,7 @@ defmodule Tracker2x2.UserSocket do
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
   def connect(_params, socket) do
+    Logger.info "connecting"
     {:ok, socket}
   end
 

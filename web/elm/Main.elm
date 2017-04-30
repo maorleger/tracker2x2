@@ -9,6 +9,10 @@ import Json.Encode as Encode
 import Mouse exposing (Position)
 import Number.Bounded as Bounded exposing (Bounded)
 import Http
+import Phoenix.Socket
+import Phoenix.Channel
+import Phoenix.Push
+import Task
 
 
 type alias Size =
@@ -86,6 +90,7 @@ type alias Model =
     , error : Maybe String
     , focusedStory : Maybe Story
     , epicLabels : List String
+    , phxSocket : Phoenix.Socket.Socket Msg
     }
 
 
@@ -120,6 +125,11 @@ init flags =
 
         stories =
             []
+
+        initSocket =
+            Phoenix.Socket.init "ws://localhost:4000/socket/websocket"
+                |> Phoenix.Socket.withDebug
+                |> Phoenix.Socket.on "shout" "room:lobby" ReceiveMessage
     in
         ( { stories = stories
           , drag = Nothing
@@ -128,8 +138,9 @@ init flags =
           , error = Nothing
           , focusedStory = Nothing
           , epicLabels = []
+          , phxSocket = initSocket
           }
-        , Cmd.none
+        , Task.succeed JoinChannel |> Task.perform identity
         )
 
 
@@ -258,6 +269,13 @@ type Msg
     | FetchEpics
     | EpicsResponse (Result Http.Error (List String))
     | Go
+    | PhoenixMsg (Phoenix.Socket.Msg Msg)
+    | SendMessage
+    | ReceiveMessage Encode.Value
+    | HandleSendError Encode.Value
+    | JoinChannel
+    | ShowJoinedMessage String
+    | ShowLeftMessage String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -374,6 +392,62 @@ update msg model =
                 Ok stories ->
                     ( { model | stories = stories, error = Nothing }, Cmd.none )
 
+        PhoenixMsg msg ->
+            let
+                ( phxSocket, phxCmd ) =
+                    Phoenix.Socket.update msg model.phxSocket
+            in
+                ( { model | phxSocket = phxSocket }, Cmd.map PhoenixMsg phxCmd )
+
+        SendMessage ->
+            let
+                payload =
+                    Encode.object
+                        [ ( "token", Encode.string model.settings.editingToken )
+                        , ( "user_id", Encode.int model.settings.userId )
+                        ]
+
+                phxPush =
+                    Phoenix.Push.init "new_msg" "room:lobby"
+                        |> Phoenix.Push.withPayload payload
+                        |> Phoenix.Push.onOk ReceiveMessage
+                        |> Phoenix.Push.onError HandleSendError
+
+                ( phxSocket, phxCmd ) =
+                    Phoenix.Socket.push phxPush model.phxSocket
+            in
+                Phoenix.Socket.withDebug phxSocket
+                    |> \socket ->
+                        ( { model | phxSocket = socket }, Cmd.map PhoenixMsg phxCmd )
+
+        ReceiveMessage _ ->
+            ( model, Cmd.none )
+
+        HandleSendError _ ->
+            ( { model | error = Just "Failed to send message" }, Cmd.none )
+
+        JoinChannel ->
+            let
+                channel =
+                    Phoenix.Channel.init "room:lobby"
+                        |> Phoenix.Channel.onJoin (always (ShowJoinedMessage "room:lobby"))
+                        |> Phoenix.Channel.onClose (always (ShowLeftMessage "room:lobby"))
+
+                ( phxSocket, phxCmd ) =
+                    Phoenix.Socket.join channel model.phxSocket
+            in
+                ( { model | phxSocket = phxSocket }, Cmd.map PhoenixMsg phxCmd )
+
+        ShowJoinedMessage channelName ->
+            ( { model | error = Just <| ("Joined channel " ++ channelName) }
+            , Cmd.none
+            )
+
+        ShowLeftMessage channelName ->
+            ( { model | error = Just <| ("Left channel " ++ channelName) }
+            , Cmd.none
+            )
+
 
 updateStoryPosition : Axis -> Maybe Drag -> Story -> Story
 updateStoryPosition axisLock maybeDrag story =
@@ -418,12 +492,16 @@ updateDrag msg drag =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    case model.drag of
-        Nothing ->
-            Sub.none
+    let
+        mouseSubscriptions =
+            case model.drag of
+                Nothing ->
+                    Sub.none
 
-        Just _ ->
-            Sub.batch [ Mouse.moves DragAt, Mouse.ups DragEnd ]
+                Just _ ->
+                    Sub.batch [ Mouse.moves DragAt, Mouse.ups DragEnd ]
+    in
+        Sub.batch [ Phoenix.Socket.listen model.phxSocket PhoenixMsg, mouseSubscriptions ]
 
 
 
@@ -486,7 +564,7 @@ view model =
             div []
                 [ h1 [] [ text "Whoops! We don't have a tracker token for you" ]
                 , h3 [] [ text "Input it below. Don't worry, you will only have to do this once" ]
-                , Html.form [ onSubmit SaveAndSetToken ] <|
+                , Html.form [ onSubmit SendMessage ] <|
                     [ input [ onInput <| Update Token, placeholder "Token", value model.settings.editingToken ] []
                     , input [ type_ "submit" ] []
                     ]
