@@ -9,7 +9,3 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
-Tracker2x2.Repo.delete_all Tracker2x2.User
-
-Tracker2x2.User.changeset(%Tracker2x2.User{}, %{name: "Test User", email: "testuser@example.com", password: "secret", password_confirmation: "secret"})
-|> Tracker2x2.Repo.insert!

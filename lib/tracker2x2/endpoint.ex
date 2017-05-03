@@ -36,7 +36,7 @@ defmodule Tracker2x2.Endpoint do
   plug Plug.Session,
     store: :cookie,
     key: "_tracker2x2_key",
-    signing_salt: "lNEIg0+b"
+    signing_salt: "C5pQTAUa"
 
   plug Tracker2x2.Router
 end

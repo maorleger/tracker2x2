@@ -19,9 +19,3 @@ import "phoenix_html"
 // paths "./socket" or full ones "web/static/js/socket".
 
 // import socket from "./socket"
-import Elm from './main';
-var elmFlags = {
-  userId: userId,
-  trackerToken: trackerToken
-};
-Elm.Main.embed(document.getElementById('main'), elmFlags);
