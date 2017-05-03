@@ -19,3 +19,5 @@ import "phoenix_html"
 // paths "./socket" or full ones "web/static/js/socket".
 
 // import socket from "./socket"
+import Elm from './main';
+Elm.Main.embed(document.getElementById('elm-main'));
