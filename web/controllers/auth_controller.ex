@@ -5,6 +5,13 @@ defmodule Tracker2x2.AuthController do
     redirect conn, external: authorize_url!(provider)
   end
 
+  def destroy(conn, params) do
+    conn
+    |> delete_session(:current_user)
+    |> delete_session(:access_token)
+    |> redirect(to: page_path(conn, :index))
+  end
+
   def callback(conn, %{"provider" => provider, "code" => code} = params) do
     client = get_token!(provider, code)
     user = get_user!(provider, client)

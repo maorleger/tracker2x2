@@ -22,6 +22,7 @@ defmodule Tracker2x2.Router do
   scope "/auth", Tracker2x2 do
     pipe_through :browser
 
+    get "/destroy", AuthController, :destroy
     get "/:provider", AuthController, :index
     get "/:provider/callback", AuthController, :callback
   end
