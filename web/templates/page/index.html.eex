@@ -1,1 +1,11 @@
-<div id="elm-main"></div>
+<%= if @current_user do %>
+  <%# <div id="elm-main"></div> %>
+  <div><%= @current_user.name %></div>
+<% else %>
+  <%= link to: auth_path(@conn, :index, "google"), class: "btn btn-primary" do %>
+    Sign in with Google
+  <% end %>
+  <%= link to: auth_path(@conn, :index, "github"), class: "btn btn-primary" do %>
+    Sign in with github
+  <% end %>
+<% end %>

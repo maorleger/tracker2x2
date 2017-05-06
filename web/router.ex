@@ -19,6 +19,13 @@ defmodule Tracker2x2.Router do
     get "/", PageController, :index
   end
 
+  scope "/auth", Tracker2x2 do
+    pipe_through :browser
+
+    get "/:provider", AuthController, :index
+    get "/:provider/callback", AuthController, :callback
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", Tracker2x2 do
   #   pipe_through :api

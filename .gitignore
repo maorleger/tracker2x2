@@ -31,3 +31,6 @@ dist/
 
 # generated elm file
 web/static/js/main.js
+
+# local setup files
+local.sh
