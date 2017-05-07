@@ -52,13 +52,13 @@ defmodule Tracker2x2.AuthController do
     IO.inspect client
     user_url = "https://www.googleapis.com/plus/v1/people/me/openIdConnect"
     %{body: user} = OAuth2.Client.get!(client, user_url)
-    %{name: user["name"]}
+    %{name: user["name"], email: user["email"]}
   end
 
   defp get_user!("github", client) do
     IO.puts "in github callback"
     IO.inspect client
     %{body: user} = OAuth2.Client.get!(client, "https://api.github.com/user")
-    %{name: user["name"], avatar: user["avatar_url"]}
+    %{name: user["name"], email: user["email"]}
   end
 end
