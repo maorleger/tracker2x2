@@ -7,6 +7,7 @@ defmodule Tracker2x2.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug Tracker2x2.Auth
   end
 
   pipeline :api do
@@ -17,6 +18,7 @@ defmodule Tracker2x2.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
+    get "/elm", ElmController, :index
   end
 
   scope "/auth", Tracker2x2 do

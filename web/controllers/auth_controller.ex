@@ -19,7 +19,7 @@ defmodule Tracker2x2.AuthController do
     conn
     |> put_session(:current_user, user)
     |> put_session(:access_token, client.token.access_token)
-    |> redirect(to: "/")
+    |> redirect(to: elm_path(conn, :index))
   end
 
   defp authorize_url!("google") do
