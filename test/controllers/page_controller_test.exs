@@ -3,6 +3,8 @@ defmodule Tracker2x2.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get conn, "/"
-    assert html_response(conn, 200) =~ "Sign in with Google"
+    response = html_response(conn, 200) 
+    assert response =~ "Sign in with Google"
+    assert response =~ "Sign in with GitHub"
   end
 end

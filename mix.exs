@@ -7,6 +7,7 @@ defmodule Tracker2x2.Mixfile do
      elixir: "~> 1.2",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
+     preferred_cli_env: [espec: :test],
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      aliases: aliases(),
@@ -38,7 +39,9 @@ defmodule Tracker2x2.Mixfile do
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:gettext, "~> 0.11"},
      {:cowboy, "~> 1.0"},
-     {:oauth2, "~> 0.3"}]
+     {:oauth2, "~> 0.3"},
+     {:espec, "~> 1.4.0", only: :test},
+     {:espec_phoenix, "~> 0.6.8", only: :test}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

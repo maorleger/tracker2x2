@@ -9,6 +9,6 @@
     Sign in with Google
   <% end %>
   <%= link to: auth_path(@conn, :index, "github"), class: "btn btn-primary" do %>
-    Sign in with github
+    Sign in with GitHub
   <% end %>
 <% end %>
