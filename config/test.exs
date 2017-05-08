@@ -12,8 +12,8 @@ config :logger, level: :warn
 # Configure your database
 config :tracker2x2, Tracker2x2.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
+  username: "ecto",
+  password: "password",
   database: "tracker2x2_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
