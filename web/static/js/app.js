@@ -22,5 +22,5 @@ import "phoenix_html"
 import Elm from './main';
 const elmDiv = document.querySelector('#elm-main');
 if (elmDiv) {
-  Elm.Main.embed(elmDiv);
+  Elm.Main.embed(elmDiv, {userId: userId});
 }

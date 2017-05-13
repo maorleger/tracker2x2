@@ -15,12 +15,14 @@ defmodule Tracker2x2.Auth do
   defp get_or_create_user(conn) do
     email = get_session(conn, :oauth_email)
     if email do
-      case Tracker2x2.Repo.get_by(Tracker2x2.User, email: email) do
+      {:ok, user} = case Tracker2x2.Repo.get_by(Tracker2x2.User, email: email) do
         nil -> %User{email: email}
         user -> user
       end
       |> Tracker2x2.User.changeset
       |> Tracker2x2.Repo.insert_or_update
+      
+      user
     end
   end
 end
