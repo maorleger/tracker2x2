@@ -1,1 +1,11 @@
-/* This file is for your main application css. */
+body {
+  background: #222;
+  font-family: 'San Francisco', Helvetica, Arial, san-serif;
+}
+.header {
+  display: flex;
+  justify-content: flex-end;
+}
+.nav {
+  margin-top: 0px;
+}

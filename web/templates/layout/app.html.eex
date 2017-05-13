@@ -5,22 +5,36 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="author" content="Maor Leger; Jeff Schomay; Tom Osugi">
 
-    <title>Hello Tracker2x2!</title>
+    <title>Tracker2x2</title>
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
   </head>
 
   <body>
-    <div class="container">
-      <header class="header">
-        <nav role="navigation">
+      <div class="header">
           <ul class="nav nav-pills pull-right">
-            <li><a href="http://www.phoenixframework.org/docs">Get Started</a></li>
+            <%= if @current_user do %>
+              <li>
+                <%= link to: auth_path(@conn, :destroy) do %>
+                  Sign out
+                <% end %>
+              </li>
+            <% else %>
+              <li>
+                <%= link to: auth_path(@conn, :index, "google") do %>
+                  Sign in with Google
+                <% end %>
+              </li>
+              <li>
+                <%= link to: auth_path(@conn, :index, "github") do %>
+                  Sign in with GitHub
+                <% end %>
+              </li>
+            <% end %>
           </ul>
-        </nav>
-        <span class="logo"></span>
-      </header>
+      </div>
+    <div class="container">
 
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
       <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>

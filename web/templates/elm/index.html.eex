@@ -1,5 +1,1 @@
 <div id="elm-main"></div>
-
-<%= link to: auth_path(@conn, :destroy), class: "btn btn-danger" do %>
-  Sign out
-<% end %>
