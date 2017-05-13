@@ -6,7 +6,7 @@ defmodule Tracker2x2.AuthControllerSpec do
   before do
     conn =
       build_conn()
-      |> init_test_session(current_user: "test", access_token: "foo", some_other_info: "bar")
+      |> init_test_session(oauth_email: "test", access_token: "foo", some_other_info: "bar")
     {:ok, %{conn: conn}}
   end
 
@@ -31,6 +31,10 @@ defmodule Tracker2x2.AuthControllerSpec do
     it "sets the session variables" do
       # conn = AuthController.callback(conn(), %{"provider" => "test", "code" => "Test Code"})
 
+    end
+
+    it "creates a user in the database" do
+      # TODO: check that a new user has been created
     end
   end
 

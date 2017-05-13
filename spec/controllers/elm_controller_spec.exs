@@ -16,7 +16,7 @@ defmodule Tracker2x2.ElmControllerSpec do
         conn = 
           conn()
           |> assign(:current_user, nil)
-          |> init_test_session(current_user: nil)
+          |> init_test_session(oauth_email: nil)
           |> fetch_flash
           |> ElmController.authenticate({})
         expect(conn.halted).to eq(true)

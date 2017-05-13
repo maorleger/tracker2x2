@@ -7,17 +7,17 @@ defmodule Tracker2x2.AuthController do
 
   def destroy(conn, _params) do
     conn
-    |> delete_session(:current_user)
+    |> delete_session(:oauth_email)
     |> delete_session(:access_token)
     |> redirect(to: page_path(conn, :index))
   end
 
   def callback(conn, %{"provider" => provider, "code" => code} = params) do
     client = get_token!(provider, code)
-    user = get_user!(provider, client)
+    %{email: email} = get_user!(provider, client)
 
     conn
-    |> put_session(:current_user, user)
+    |> put_session(:oauth_email, email)
     |> put_session(:access_token, client.token.access_token)
     |> redirect(to: elm_path(conn, :index))
   end
@@ -27,7 +27,7 @@ defmodule Tracker2x2.AuthController do
   end
 
   defp authorize_url!("github") do
-    GitHub.authorize_url!
+    GitHub.authorize_url!(scope: "user:email")
   end
 
   defp authorize_url!(url) do
@@ -49,11 +49,15 @@ defmodule Tracker2x2.AuthController do
   defp get_user!("google", client) do
     user_url = "https://www.googleapis.com/plus/v1/people/me/openIdConnect"
     %{body: user} = OAuth2.Client.get!(client, user_url)
-    %{name: user["name"], email: user["email"]}
+    %{email: user["email"]}
   end
 
   defp get_user!("github", client) do
-    %{body: user} = OAuth2.Client.get!(client, "https://api.github.com/user")
-    %{name: user["name"], email: user["email"]}
+    %{body: user_emails} = OAuth2.Client.get!(client, "https://api.github.com/user/emails")
+    email = case Enum.find(user_emails, fn(email) -> email["primary"] end) do
+      nil -> nil
+      record -> record["email"]
+    end
+    %{email: email}
   end
 end

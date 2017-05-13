@@ -4,7 +4,6 @@ defmodule Tracker2x2.ElmController do
 
   def index(conn, _params) do
     conn
-    |> assign(:current_user, get_session(conn, :current_user))
     |> render("index.html")
   end
 

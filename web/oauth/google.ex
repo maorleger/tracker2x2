@@ -20,8 +20,6 @@ defmodule Google do
   end
 
   def get_token!(params \\ [], headers \\ []) do
-    IO.puts "GOOOOOOOOO"
-    IO.inspect params
     OAuth2.Client.get_token!(client(), Keyword.merge(params, client_secret: client().client_secret))
   end
 
@@ -31,7 +29,6 @@ defmodule Google do
   end
 
   def get_token(client, params, headers) do
-    IO.puts "in Google:get_token"
     client
     |> put_header("Accept", "application/json")
     |> AuthCode.get_token(params, headers)
