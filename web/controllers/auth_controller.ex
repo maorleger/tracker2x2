@@ -5,7 +5,7 @@ defmodule Tracker2x2.AuthController do
     redirect conn, external: authorize_url!(provider)
   end
 
-  def destroy(conn, params) do
+  def destroy(conn, _params) do
     conn
     |> delete_session(:current_user)
     |> delete_session(:access_token)
@@ -35,7 +35,6 @@ defmodule Tracker2x2.AuthController do
   end
 
   defp get_token!("google", code) do
-    IO.puts "in get_token!"
     Google.get_token!(code: code)
   end
 
@@ -48,16 +47,12 @@ defmodule Tracker2x2.AuthController do
   end
 
   defp get_user!("google", client) do
-    IO.puts "in google callback"
-    IO.inspect client
     user_url = "https://www.googleapis.com/plus/v1/people/me/openIdConnect"
     %{body: user} = OAuth2.Client.get!(client, user_url)
     %{name: user["name"], email: user["email"]}
   end
 
   defp get_user!("github", client) do
-    IO.puts "in github callback"
-    IO.inspect client
     %{body: user} = OAuth2.Client.get!(client, "https://api.github.com/user")
     %{name: user["name"], email: user["email"]}
   end

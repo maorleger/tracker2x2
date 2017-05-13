@@ -41,7 +41,8 @@ defmodule Tracker2x2.Mixfile do
      {:cowboy, "~> 1.0"},
      {:oauth2, "~> 0.3"},
      {:espec, "~> 1.4.0", only: :test},
-     {:espec_phoenix, "~> 0.6.8", only: :test}]
+     {:espec_phoenix, "~> 0.6.8", only: :test},
+     {:meck, "0.8.4", only: :test}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

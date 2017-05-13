@@ -6,4 +6,5 @@ defmodule Tracker2x2.PageController do
     |> assign(:current_user, get_session(conn, :current_user))
     |> render("index.html")
   end
+
 end

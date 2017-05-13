@@ -1,11 +1,10 @@
-defmodule PageControllerSpec do
+defmodule Tracker2x2.PageControllerSpec do
   import Plug.Test
   use ESpec.Phoenix, controller: PageController
 
   before do
     conn = 
       build_conn()
-      |> bypass_through(Rumbl.Router, :browser)
     {:ok, %{conn: conn}}
   end
 
