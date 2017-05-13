@@ -20,7 +20,7 @@ defmodule Tracker2x2.Mixfile do
   def application do
     [mod: {Tracker2x2, []},
      applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex, :oauth2]]
+                    :phoenix_ecto, :postgrex, :oauth2, :cloak]]
   end
 
   # Specifies which paths to compile per environment.
@@ -40,6 +40,7 @@ defmodule Tracker2x2.Mixfile do
      {:gettext, "~> 0.11"},
      {:cowboy, "~> 1.0"},
      {:oauth2, "~> 0.3"},
+     {:cloak, "~> 0.3.1"},
      {:espec, "~> 1.4.0", only: :test},
      {:espec_phoenix, "~> 0.6.8", only: :test},
      {:meck, "0.8.4", only: :test}]
