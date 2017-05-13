@@ -7,5 +7,6 @@ defmodule ElmControllerSpec do
   end
 
   describe "when the user is not logged in" do
+  
   end
 end
