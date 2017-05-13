@@ -19,6 +19,7 @@ defmodule Tracker2x2.AuthController do
     conn
     |> put_session(:oauth_email, email)
     |> put_session(:access_token, client.token.access_token)
+    |> configure_session(renew: true)
     |> redirect(to: elm_path(conn, :index))
   end
 
