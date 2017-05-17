@@ -12,10 +12,10 @@ defmodule Tracker2x2.PageControllerTest do
   test "When the user is logged in displays logout button", %{conn: conn} do
     conn = 
       conn
-      |> init_test_session(current_user: "test")
+      |> init_test_session(oauth_email: "maor.leger@example.com")
       |> get "/"
 
-    response = html_response(conn, 200)
-    assert response =~ "Sign out"
+    response = html_response(conn, 302)
+    assert conn.halted
   end
 end

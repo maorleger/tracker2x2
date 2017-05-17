@@ -20,11 +20,6 @@ defmodule Tracker2x2.PageControllerSpec do
 
   describe "when a user is logged in" do
     it "displays a logout button" do
-      response = 
-        conn()
-        |> init_test_session(current_user: "test")
-        |> get(:index)
-      expect(response.resp_body).to have("Sign out")
     end
   end
 end
