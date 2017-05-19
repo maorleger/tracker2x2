@@ -19,4 +19,8 @@ defmodule Tracker2x2.ElmControllerTest do
     response = html_response(conn, 200)
     assert response =~ "Sign out"
   end
+  
+  test "edit" do
+
+  end
 end

@@ -9,13 +9,24 @@ defmodule Tracker2x2.PageControllerTest do
     assert response =~ "Sign in with GitHub"
   end
 
-  test "When the user is logged in displays logout button", %{conn: conn} do
+  test "When the user is logged in and has a token redirects to elm page", %{conn: conn} do
     conn = 
       conn
-      |> init_test_session(oauth_email: "maor.leger@example.com")
+      |> init_test_session(oauth_email: "has_token@example.com")
       |> get "/"
 
-    response = html_response(conn, 302)
+    assert redirected_to(conn) == "/elm"
     assert conn.halted
+  end
+
+  test "when the user is logged in and has no token reidrects to token page", %{conn: conn} do
+    conn =
+      conn
+      |> init_test_session(oauth_email: "no_token@example.com")
+      |> get "/"
+
+    assert redirected_to(conn) == "/elm/edit"
+    assert conn.halted
+
   end
 end

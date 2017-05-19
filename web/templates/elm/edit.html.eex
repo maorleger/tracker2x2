@@ -1,0 +1,7 @@
+<%= form_for @changeset, elm_path(@conn, :update), fn f -> %>
+  <label>
+    Token: <%= text_input f, :tracker_token %>
+  </label>
+
+  <%= submit "Submit" %>
+<% end %>

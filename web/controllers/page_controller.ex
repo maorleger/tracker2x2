@@ -9,8 +9,12 @@ defmodule Tracker2x2.PageController do
 
   def authenticate(conn, _opts) do
     if conn.assigns.current_user do
+      redirect_to = case conn.assigns.current_user.tracker_token do
+        nil -> :edit
+        _ -> :index
+      end
       conn
-      |> redirect(to: elm_path(conn, :index))
+      |> redirect(to: elm_path(conn, redirect_to))
       |> halt()
     else
       conn

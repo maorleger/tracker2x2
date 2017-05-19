@@ -19,6 +19,8 @@ defmodule Tracker2x2.Router do
 
     get "/", PageController, :index
     get "/elm", ElmController, :index
+    get "/elm/edit", ElmController, :edit
+    put "/elm/update", ElmController, :update
   end
 
   scope "/auth", Tracker2x2 do

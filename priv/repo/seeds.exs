@@ -12,13 +12,13 @@
 
 case Tracker2x2.Repo.get_by(Tracker2x2.User, email: "has_token@example.com") do
   nil -> 
-    Tracker2x2.Repo.insert!(%Tracker2x2.User{email: "has_token2@example.com", tracker_token: "TestToken"})
+    Tracker2x2.Repo.insert!(%Tracker2x2.User{email: "has_token@example.com", tracker_token: "TestToken"})
   _ -> nil
 end
 
 case Tracker2x2.Repo.get_by(Tracker2x2.User, email: "no_token@example.com") do
   nil ->
-    Tracker2x2.Repo.insert!(%Tracker2x2.User{email: "no_token2@example.com"})
+    Tracker2x2.Repo.insert!(%Tracker2x2.User{email: "no_token@example.com"})
   _ -> nil
 end
 
