@@ -1,6 +1,7 @@
 body {
   background: #222;
   font-family: 'San Francisco', Helvetica, Arial, san-serif;
+  color: #eee;
 }
 .header {
   display: flex;
@@ -8,4 +9,8 @@ body {
 }
 .nav {
   margin-top: 0px;
+}
+
+.jumbotron p {
+  color: black;
 }
