@@ -5,8 +5,10 @@ defmodule Tracker2x2.UserRepoTest do
 
   @valid_attrs %{email: "maor.leger@example.com", tracker_token: "some token", encryption_version: "some version"}
 
-  def changeset(email) do
-    attrs = Map.put(@valid_attrs, :email, email)
+  def changeset(email, tracker_token \\ nil) do
+    attrs = 
+      Map.put(@valid_attrs, :email, email)
+      |> Map.put(:tracker_token, tracker_token)
     User.changeset(%User{}, attrs)
   end
 

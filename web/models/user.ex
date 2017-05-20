@@ -20,3 +20,4 @@ defmodule Tracker2x2.User do
     |> put_change(:encryption_version, Cloak.version)
   end
 end
+

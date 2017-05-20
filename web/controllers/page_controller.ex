@@ -14,7 +14,7 @@ defmodule Tracker2x2.PageController do
         _ -> :index
       end
       conn
-      |> redirect(to: elm_path(conn, redirect_to))
+      |> redirect(to: app_path(conn, redirect_to))
       |> halt()
     else
       conn

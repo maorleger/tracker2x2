@@ -18,9 +18,9 @@ defmodule Tracker2x2.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
-    get "/elm", ElmController, :index
-    get "/elm/edit", ElmController, :edit
-    put "/elm/update", ElmController, :update
+    get "/app", AppController, :index
+    get "/app/edit", AppController, :edit
+    put "/app/update", AppController, :update
   end
 
   scope "/auth", Tracker2x2 do

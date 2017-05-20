@@ -1,6 +1,6 @@
-defmodule Tracker2x2.ElmController do
+defmodule Tracker2x2.AppController do
   use Tracker2x2.Web, :controller
-  plug :authenticate when action in [:index, :token]
+  plug :authenticate when action in [:index, :edit, :update]
 
   def index(conn, _params) do
     conn
@@ -29,13 +29,18 @@ defmodule Tracker2x2.ElmController do
   end
 
   def authenticate(conn, _opts) do
-    if conn.assigns.current_user && conn.assigns.current_user.tracker_token do
-      conn
-    else
-      conn
-      |> put_flash(:error, "Please login to continue")
-      |> redirect(to: page_path(conn, :index))
-      |> halt()
+    conn = case conn.assigns.current_user do
+      nil -> 
+        conn
+        |> put_flash(:error, "Please login to continue")
+        |> redirect(to: page_path(conn, :index))
+        |> halt()
+      %Tracker2x2.User{tracker_token: nil} ->
+        conn
+        |> redirect(to: page_path(conn, :index))
+        |> halt()
+      _ -> 
+        conn
     end
   end
 end
