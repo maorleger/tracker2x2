@@ -1,10 +1,10 @@
 defmodule Tracker2x2.UserTest do
-  use Tracker2x2.ModelCase
+  use Tracker2x2.ModelCase, async: true
 
   alias Tracker2x2.User
 
   @valid_attrs %{email: "some content", encryption_version: "some content", tracker_token: "some content"}
-  @invalid_attrs %{}
+  @invalid_attrs %{email: ""}
 
   test "changeset with valid attributes" do
     changeset = User.changeset(%User{}, @valid_attrs)

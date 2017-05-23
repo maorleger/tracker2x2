@@ -1,5 +1,5 @@
 defmodule Tracker2x2.AppControllerTest do
-  use Tracker2x2.ConnCase
+  use Tracker2x2.ConnCase, async: true
   import Plug.Test
 
   test "all actions are guarded against users not signed in", %{conn: conn} do

@@ -1,5 +1,5 @@
 defmodule Tracker2x2.PageControllerTest do
-  use Tracker2x2.ConnCase
+  use Tracker2x2.ConnCase, async: true
   import Plug.Test
 
   test "When the user is not logged in displays login buttons", %{conn: conn} do

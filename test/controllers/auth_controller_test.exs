@@ -1,5 +1,5 @@
 defmodule Tracker2x2.AuthControllerTest do
-  use Tracker2x2.ConnCase
+  use Tracker2x2.ConnCase, async: true
   import Plug.Test
   alias Tracker2x2.AuthController
 
