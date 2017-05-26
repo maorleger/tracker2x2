@@ -7,6 +7,7 @@ import Http
 
 type alias Flags =
     { userId : Int
+    , token : String
     }
 
 
@@ -41,6 +42,7 @@ type alias RequestParams =
     { projectId : String
     , label : String
     , userId : Int
+    , token : String
     }
 
 

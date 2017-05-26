@@ -46,4 +46,13 @@ defmodule Tracker2x2.AppControllerTest do
 
     assert Tracker2x2.Repo.get_by(Tracker2x2.User, email: "has_token@example.com").tracker_token == "New Shiny Token"
   end
+
+  test "it sets the session token if all is well", %{conn: conn} do
+    conn = 
+      conn
+      |> init_test_session(oauth_email: "has_token@example.com")
+      |> get("/app")
+
+    assert conn.assigns.token
+  end
 end

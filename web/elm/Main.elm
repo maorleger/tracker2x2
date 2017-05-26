@@ -69,6 +69,7 @@ init flags =
             { projectId = ""
             , label = ""
             , userId = flags.userId
+            , token = flags.token
             }
         }
             ! []

@@ -5,7 +5,7 @@ defmodule Tracker2x2.AppController do
   plug :authenticate when action in [:index, :edit, :update]
   plug :ensure_token when action in [:index]
 
-  def index(conn, _params, _current_user) do
+  def index(conn, _params, current_user) do
     conn
     |> render("index.html")
   end
@@ -51,6 +51,7 @@ defmodule Tracker2x2.AppController do
         |> halt()
       _ ->
         conn
+        |> assign(:token, Phoenix.Token.sign(conn, "user", conn.assigns.current_user.id))
     end
   end
 

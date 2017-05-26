@@ -1,3 +1,5 @@
-<%= @current_user.tracker_token %>
 <div id="elm-main"></div>
-<script>window.userId = <%= @current_user.id %></script>
+<script>
+window.userId = <%= @current_user.id %>
+window.token = "<%= @token %>"
+</script>
