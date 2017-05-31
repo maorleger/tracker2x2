@@ -13,7 +13,7 @@ defmodule Tracker2x2.PageControllerTest do
     conn = 
       conn
       |> init_test_session(oauth_email: "has_token@example.com")
-      |> get "/"
+      |> get("/")
 
     assert redirected_to(conn) == app_path(conn, :index)
     assert conn.halted
@@ -23,7 +23,7 @@ defmodule Tracker2x2.PageControllerTest do
     conn =
       conn
       |> init_test_session(oauth_email: "no_token@example.com")
-      |> get "/"
+      |> get("/")
 
     assert redirected_to(conn) == app_path(conn, :edit)
     assert conn.halted

@@ -12,6 +12,7 @@ defmodule Tracker2x2.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug Tracker2x2.ApiAuth
   end
 
   scope "/", Tracker2x2 do
@@ -29,6 +30,12 @@ defmodule Tracker2x2.Router do
     get "/destroy", AuthController, :destroy
     get "/:provider", AuthController, :index
     get "/:provider/callback", AuthController, :callback
+  end
+
+  scope "/api", Tracker2x2 do
+    pipe_through :api
+
+    get "/", ApiController, :test
   end
 
   # Other scopes may use custom stacks.
