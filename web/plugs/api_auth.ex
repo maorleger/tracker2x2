@@ -8,12 +8,13 @@ defmodule Tracker2x2.ApiAuth do
   end
 
   def call(%Plug.Conn{params: %{"user_id" => user_id, "token" => token}} = conn, _opts) do
-    case Phoenix.Token.verify(conn, "user", token) do
-      {:ok, _} ->
-        conn
-        |> assign(:tracker_token, get_tracker_token(user_id))
-      {:error, _} ->
-        send_401(conn)
+    with {:ok, token_user_id} <- Phoenix.Token.verify(conn, "user", token),
+         {:ok, _} <- verify_token_user(token_user_id, user_id)
+    do
+      conn
+      |> assign(:tracker_token, get_tracker_token(token_user_id))
+    else
+      _ ->send_401(conn)
     end
   end
 
@@ -25,6 +26,14 @@ defmodule Tracker2x2.ApiAuth do
     conn
     |> send_resp(401, "unauthorized")
     |> halt()
+  end
+
+  defp verify_token_user(token_user_id, user_id) do
+    if "#{token_user_id}" == "#{user_id}" do
+      {:ok, user_id}
+    else
+      {:error, "user id does not match the token"}
+    end
   end
 
   defp get_tracker_token(user_id) do
