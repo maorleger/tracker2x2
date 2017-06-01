@@ -1,8 +1,13 @@
 defmodule Tracker2x2.ApiController do
   use Tracker2x2.Web, :controller
-  alias Tracker2x2.User
 
   def test(conn, _params) do
-    render(conn, "test.json")
+    if conn.assigns.tracker_token do
+      render(conn, "test.json")
+    else
+      conn
+      |> send_resp(404, "not found")
+      |> halt()
+    end
   end
 end
