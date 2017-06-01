@@ -9,10 +9,9 @@ defmodule Tracker2x2.ApiAuth do
 
   def call(%Plug.Conn{params: %{"user_id" => user_id, "token" => token}} = conn, _opts) do
     case Phoenix.Token.verify(conn, "user", token) do
-      {:ok, user_id} -> 
-        
+      {:ok, _} ->
         conn
-        |> assign(:tracker_token, get_tracker_token(user_id, token))
+        |> assign(:tracker_token, get_tracker_token(user_id))
       {:error, _} ->
         send_401(conn)
     end
@@ -28,9 +27,13 @@ defmodule Tracker2x2.ApiAuth do
     |> halt()
   end
 
-  defp get_tracker_token(user_id, token) do
+  defp get_tracker_token(user_id) do
     user = Repo.get(User, user_id)
-    user.tracker_token
+    if user do
+      user.tracker_token
+    else
+      nil
+    end
   end
 
 end

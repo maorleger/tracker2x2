@@ -12,7 +12,7 @@ defmodule Tracker2x2.AuthController do
     |> redirect(to: page_path(conn, :index))
   end
 
-  def callback(conn, %{"provider" => provider, "code" => code} = params) do
+  def callback(conn, %{"provider" => provider, "code" => code}) do
     client = get_token!(provider, code)
     %{email: email} = get_user!(provider, client)
 
