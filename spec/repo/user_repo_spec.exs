@@ -12,7 +12,7 @@ defmodule Tracker2x2.UserRepoSpec do
     end
 
     before do
-      changeset
+      changeset()
       |> Repo.insert!()
     end
 

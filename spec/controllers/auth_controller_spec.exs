@@ -23,10 +23,10 @@ defmodule Tracker2x2.AuthControllerSpec do
 
   describe "#callback" do
     before do
-      allow(AuthController).to accept(
-        get_token!: fn(provider, code) -> "Test Token" end,
-        get_user!: fn(_,_) -> %{name: "Maor", email: "maor.leger@example.com" } end
-      )
+      # allow(AuthController).to accept(
+      #   get_token!: fn(provider, code) -> "Test Token" end,
+      #   get_user!: fn(_,_) -> %{name: "Maor", email: "maor.leger@example.com" } end
+      # )
     end
     it "sets the session variables" do
       # conn = AuthController.callback(conn(), %{"provider" => "test", "code" => "Test Code"})

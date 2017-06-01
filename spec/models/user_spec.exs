@@ -3,7 +3,6 @@ defmodule Tracker2x2.UserSpec do
   alias Tracker2x2.User
 
   @valid_attrs %{email: "some content", encryption_version: "some content", tracker_token: "some content"}
-  @invalid_attrs %{}
 
   describe "validation" do
     it "checks changeset with valid attributes" do

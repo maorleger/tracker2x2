@@ -13,7 +13,7 @@ defmodule Tracker2x2.AuthControllerTest do
     assert get_session(conn, :some_other_info) == "bar"
   end
 
-  test "#callback", %{conn: conn} do
+  test "#callback" do
 
   end
 end

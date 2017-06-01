@@ -1,5 +1,4 @@
 defmodule Tracker2x2.PageControllerSpec do
-  import Plug.Test
   use ESpec.Phoenix, controller: PageController
 
   before do
