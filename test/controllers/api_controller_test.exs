@@ -1,17 +1,10 @@
 defmodule Tracker2x2.ApiControllerTest do
   use Tracker2x2.ConnCase, async: true
 
-  def token_user do
-    Tracker2x2.Repo.get_by(Tracker2x2.User, email: "has_token@example.com").id
-  end
-
-  def no_token_user do
-    Tracker2x2.Repo.get_by(Tracker2x2.User, email: "no_token@example.com").id
-  end
 
   test "works", %{conn: conn} do
     user_id = token_user()
-    token = Phoenix.Token.sign(Tracker2x2.Endpoint, "user", user_id)
+    token = Phoenix.Token.sign(Tracker2x2.Endpoint, System.get_env("APP_SALT"), user_id)
     conn = 
       conn
       |> get("/api", %{"user_id" => user_id, "token" => token})
@@ -47,7 +40,7 @@ defmodule Tracker2x2.ApiControllerTest do
     no_token_user_id = no_token_user()
     token_user_id = token_user()
 
-    token = Phoenix.Token.sign(Tracker2x2.Endpoint, "user", no_token_user_id)
+    token = Phoenix.Token.sign(Tracker2x2.Endpoint, System.get_env("APP_SALT"), no_token_user_id)
     conn =
       conn
       |> get("/api", %{"user_id" => token_user_id, "token" => token})
@@ -57,11 +50,20 @@ defmodule Tracker2x2.ApiControllerTest do
 
   test "when unable to find the tracker token returns a 404", %{conn: conn} do
     no_token_user_id = no_token_user()
-    token = Phoenix.Token.sign(Tracker2x2.Endpoint, "user", no_token_user_id)
+    token = Phoenix.Token.sign(Tracker2x2.Endpoint, System.get_env("APP_SALT"), no_token_user_id)
     conn =
       conn
       |> get("/api", %{"user_id" => no_token_user_id, "token" => token})
 
     assert response(conn, 404) == "not found"
   end
+
+  def token_user do
+    Tracker2x2.Repo.get_by(Tracker2x2.User, email: "has_token@example.com").id
+  end
+
+  def no_token_user do
+    Tracker2x2.Repo.get_by(Tracker2x2.User, email: "no_token@example.com").id
+  end
+
 end

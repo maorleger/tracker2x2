@@ -51,7 +51,7 @@ defmodule Tracker2x2.AppController do
         |> halt()
       _ ->
         conn
-        |> assign(:token, Phoenix.Token.sign(conn, "user", conn.assigns.current_user.id))
+        |> assign(:token, Phoenix.Token.sign(conn,System.get_env("APP_SALT"), conn.assigns.current_user.id))
     end
   end
 

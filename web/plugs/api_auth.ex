@@ -8,7 +8,7 @@ defmodule Tracker2x2.ApiAuth do
   end
 
   def call(%Plug.Conn{params: %{"user_id" => user_id, "token" => token}} = conn, _opts) do
-    with {:ok, token_user_id} <- Phoenix.Token.verify(conn, "user", token),
+    with {:ok, token_user_id} <- Phoenix.Token.verify(conn, System.get_env("APP_SALT"), token),
          {:ok, _} <- verify_token_user(token_user_id, user_id)
     do
       conn
