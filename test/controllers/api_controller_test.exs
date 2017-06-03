@@ -7,7 +7,8 @@ defmodule Tracker2x2.ApiControllerTest do
     token = Phoenix.Token.sign(Tracker2x2.Endpoint, System.get_env("APP_SALT"), user_id)
     conn = 
       conn
-      |> get("/api", %{"user_id" => user_id, "token" => token})
+      |> put_req_header("token", token)
+      |> get("/api", %{"user_id" => user_id})
     assert json_response(conn, 200) == "Success"
   end
 
@@ -31,7 +32,8 @@ defmodule Tracker2x2.ApiControllerTest do
   test "when the token is invalid returns a 401", %{conn: conn} do
     conn =
       conn
-      |> get("/api", %{"user_id" => token_user(), "token" => "bad token"})
+      |> put_req_header("token", "bad token")
+      |> get("/api", %{"user_id" => token_user()})
 
     assert response(conn, 401) == "unauthorized"
   end
@@ -43,7 +45,8 @@ defmodule Tracker2x2.ApiControllerTest do
     token = Phoenix.Token.sign(Tracker2x2.Endpoint, System.get_env("APP_SALT"), no_token_user_id)
     conn =
       conn
-      |> get("/api", %{"user_id" => token_user_id, "token" => token})
+      |> put_req_header("token", token)
+      |> get("/api", %{"user_id" => token_user_id})
 
     assert response(conn, 401) == "unauthorized"
   end
@@ -53,7 +56,8 @@ defmodule Tracker2x2.ApiControllerTest do
     token = Phoenix.Token.sign(Tracker2x2.Endpoint, System.get_env("APP_SALT"), no_token_user_id)
     conn =
       conn
-      |> get("/api", %{"user_id" => no_token_user_id, "token" => token})
+      |> put_req_header("token", token)
+      |> get("/api", %{"user_id" => no_token_user_id})
 
     assert response(conn, 404) == "not found"
   end

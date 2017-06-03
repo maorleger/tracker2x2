@@ -13,8 +13,8 @@ defmodule Tracker2x2.ApiAuth do
     opts
   end
 
-  def call(%Plug.Conn{params: %{"user_id" => user_id, "token" => token}} = conn, _opts) do
-    with {:ok, token_user_id} <- Token.verify(conn, System.get_env("APP_SALT"), token),
+  def call(%Plug.Conn{params: %{"user_id" => user_id}} = conn, _opts) do
+    with {:ok, token_user_id} <- Token.verify(conn, System.get_env("APP_SALT"), get_header_token(conn)),
          {:ok, _} <- verify_token_user(token_user_id, user_id)
     do
       conn
@@ -51,4 +51,10 @@ defmodule Tracker2x2.ApiAuth do
     end
   end
 
+  defp get_header_token(conn) do
+    case get_req_header(conn, "token") do
+      [token] -> token
+      _ -> nil
+    end
+  end
 end
