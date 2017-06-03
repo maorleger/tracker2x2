@@ -48,3 +48,23 @@ getStories board item { projectId, label } =
             , timeout = Nothing
             , withCredentials = False
             }
+
+
+testEndpoint : RequestParams -> Http.Request String
+testEndpoint params =
+    let
+        testUrl =
+            "http://localhost:4000/api?user_id=" ++ toString params.userId
+    in
+        Http.request
+            { method = "GET"
+            , headers =
+                [ Http.header "Content-Type" "application/json"
+                , Http.header "token" params.token
+                ]
+            , url = testUrl
+            , body = Http.emptyBody
+            , expect = Http.expectString
+            , timeout = Nothing
+            , withCredentials = False
+            }
