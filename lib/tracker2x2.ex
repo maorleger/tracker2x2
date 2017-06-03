@@ -1,5 +1,9 @@
 defmodule Tracker2x2 do
+  @moduledoc """
+    Tracker2x2
+  """
   use Application
+  alias Tracker2x2.{Repo, Endpoint}
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
@@ -9,9 +13,9 @@ defmodule Tracker2x2 do
     # Define workers and child supervisors to be supervised
     children = [
       # Start the Ecto repository
-      supervisor(Tracker2x2.Repo, []),
+      supervisor(Repo, []),
       # Start the endpoint when the application starts
-      supervisor(Tracker2x2.Endpoint, []),
+      supervisor(Endpoint, []),
       # Start your own worker by calling: Tracker2x2.Worker.start_link(arg1, arg2, arg3)
       # worker(Tracker2x2.Worker, [arg1, arg2, arg3]),
     ]
@@ -25,7 +29,7 @@ defmodule Tracker2x2 do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    Tracker2x2.Endpoint.config_change(changed, removed)
+    Endpoint.config_change(changed, removed)
     :ok
   end
 end

@@ -43,7 +43,8 @@ defmodule Tracker2x2.Mixfile do
      {:cloak, "~> 0.3.1"},
      {:espec, "~> 1.4.0", only: :test},
      {:espec_phoenix, "~> 0.6.8", only: :test},
-     {:meck, "0.8.4", only: :test}]
+     {:meck, "0.8.4", only: :test},
+     {:credo, "~> 0.8", only: [:dev, :test], runtime: false}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

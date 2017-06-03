@@ -1,5 +1,6 @@
 defmodule Tracker2x2.AuthController do
   use Tracker2x2.Web, :controller
+  alias OAuth2.Client
 
   def index(conn, %{"provider" => provider}) do
     redirect conn, external: authorize_url!(provider)
@@ -49,12 +50,12 @@ defmodule Tracker2x2.AuthController do
 
   defp get_user!("google", client) do
     user_url = "https://www.googleapis.com/plus/v1/people/me/openIdConnect"
-    %{body: user} = OAuth2.Client.get!(client, user_url)
+    %{body: user} = Client.get!(client, user_url)
     %{email: user["email"]}
   end
 
   defp get_user!("github", client) do
-    %{body: user_emails} = OAuth2.Client.get!(client, "https://api.github.com/user/emails")
+    %{body: user_emails} = Client.get!(client, "https://api.github.com/user/emails")
     email = case Enum.find(user_emails, fn(email) -> email["primary"] end) do
       nil -> nil
       record -> record["email"]

@@ -1,20 +1,26 @@
 defmodule Tracker2x2.ApiAuth do
+  @moduledoc """
+    Provides a plug to authenticate and grab a 
+    Pivotal Tracker token for a given user
+  """
+
   import Plug.Conn
   alias Tracker2x2.Repo
   alias Tracker2x2.User
+  alias Phoenix.Token
 
   def init(opts) do
     opts
   end
 
   def call(%Plug.Conn{params: %{"user_id" => user_id, "token" => token}} = conn, _opts) do
-    with {:ok, token_user_id} <- Phoenix.Token.verify(conn, System.get_env("APP_SALT"), token),
+    with {:ok, token_user_id} <- Token.verify(conn, System.get_env("APP_SALT"), token),
          {:ok, _} <- verify_token_user(token_user_id, user_id)
     do
       conn
       |> assign(:tracker_token, get_tracker_token(token_user_id))
     else
-      _ ->send_401(conn)
+      _ -> send_401(conn)
     end
   end
 

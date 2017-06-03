@@ -1,4 +1,7 @@
 defmodule Tracker2x2.User do
+  @moduledoc """
+    User model, defining a user with a tracker token and email
+  """
   use Tracker2x2.Web, :model
 
   schema "users" do
@@ -20,4 +23,3 @@ defmodule Tracker2x2.User do
     |> put_change(:encryption_version, Cloak.version)
   end
 end
-

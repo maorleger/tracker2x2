@@ -1,10 +1,15 @@
 defmodule Google do
+  @moduledoc """
+    Google OAuth Strategy
+  """
+
   use OAuth2.Strategy
 
   alias OAuth2.Strategy.AuthCode
+  alias OAuth2.Client
 
   def client do
-    OAuth2.Client.new([
+    Client.new([
       strategy: __MODULE__,
       client_id: System.get_env("GOOGLE_CLIENT_ID"),
       client_secret: System.get_env("GOOGLE_CLIENT_SECRET"),
@@ -16,11 +21,11 @@ defmodule Google do
   end
 
   def authorize_url!(params \\ []) do
-    OAuth2.Client.authorize_url!(client(), params)
+    Client.authorize_url!(client(), params)
   end
 
   def get_token!(params \\ [], headers \\ []) do
-    OAuth2.Client.get_token!(client(), Keyword.merge(params, client_secret: client().client_secret))
+    Client.get_token!(client(), Keyword.merge(params, client_secret: client().client_secret))
   end
 
   # strategy callback

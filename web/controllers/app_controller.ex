@@ -1,6 +1,7 @@
 defmodule Tracker2x2.AppController do
   use Tracker2x2.Web, :controller
   alias Tracker2x2.User
+  alias Phoenix.Token
 
   plug :authenticate when action in [:index, :edit, :update]
   plug :ensure_token when action in [:index]
@@ -21,7 +22,7 @@ defmodule Tracker2x2.AppController do
     changeset = User.changeset(current_user, user_params)
 
     case Repo.update(changeset) do
-      {:ok, user} -> 
+      {:ok, user} ->
         conn
         |> assign(:current_user, user)
         |> redirect(to: page_path(conn, :index))
@@ -33,12 +34,12 @@ defmodule Tracker2x2.AppController do
 
   def authenticate(conn, _opts) do
     case conn.assigns.current_user do
-      nil -> 
+      nil ->
         conn
         |> put_flash(:error, "Please login to continue")
         |> redirect(to: page_path(conn, :index))
         |> halt()
-      _ -> 
+      _ ->
         conn
     end
   end
@@ -51,11 +52,18 @@ defmodule Tracker2x2.AppController do
         |> halt()
       _ ->
         conn
-        |> assign(:token, Phoenix.Token.sign(conn,System.get_env("APP_SALT"), conn.assigns.current_user.id))
+        |> assign(
+          :token,
+          Token.sign(conn, System.get_env("APP_SALT"),
+          conn.assigns.current_user.id))
     end
   end
 
   def action(conn, _) do
-    apply(__MODULE__, action_name(conn), [conn, conn.params, conn.assigns.current_user])
+    apply(
+      __MODULE__,
+      action_name(conn),
+      [conn, conn.params, conn.assigns.current_user]
+    )
   end
 end
