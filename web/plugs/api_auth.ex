@@ -35,7 +35,7 @@ defmodule Tracker2x2.ApiAuth do
   end
 
   defp verify_token_user(token_user_id, user_id) do
-    if "#{token_user_id}" == "#{user_id}" do
+    if safe_to_int(token_user_id) == safe_to_int(user_id) do
       {:ok, user_id}
     else
       {:error, "user id does not match the token"}
@@ -56,5 +56,16 @@ defmodule Tracker2x2.ApiAuth do
       [token] -> token
       _ -> nil
     end
+  end
+
+  defp safe_to_int(binary) when is_binary(binary) do
+    case Integer.parse(binary) do
+      {int, _} when int > 0 -> {:ok, int}
+      _ -> :error
+    end
+  end
+
+  defp safe_to_int(integer) when is_integer(integer) do
+    {:ok, integer}
   end
 end
