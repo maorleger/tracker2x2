@@ -8,7 +8,7 @@ body {
   justify-content: flex-end;
 }
 .nav {
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 .jumbotron p {
@@ -88,7 +88,6 @@ body {
   cursor: move;
   border-radius: 4px;
   position: absolute;
-  color: white;
   font-family: 'San Francisco', Helvetica, Arial, san-serif;
   color: #eee;
   padding: 10px;
@@ -150,13 +149,14 @@ body {
   width: 380px;
   margin: 4em auto;
   padding: 3em 2em 2em 2em;
-  box-shadow: rgba(0,0,0,0.14902) 0px 1px 1px 0px,rgba(0,0,0,0.09804) 0px 1px 2px 0px;
+  box-shadow: rgba(0,0,0,0.14902) 0 1px 1px 0, rgba(0,0,0,0.09804) 0 1px 2px 0;
 }
 
 .group__input {
   font-size: 18px;
 	padding: 10px 10px 10px 5px;
-	-webkit-appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 	display: block;
 	background: #fafafa;
 	color: #636363;
@@ -166,9 +166,9 @@ body {
 	border-bottom: 1px solid #757575;
 }
 
-.group__input:focus {
-  outline: none;
-}
+/* .group__input:focus { */
+/*   outline: none; */
+/* } */
 
 .group__label {
 	color: #999;
