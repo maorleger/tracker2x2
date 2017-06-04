@@ -17,3 +17,6 @@ config :tracker2x2, Tracker2x2.Repo,
   database: "tracker2x2_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
+
+# configure the tracker api module
+config :tracker2x2, :tracker_api, Tracker2x2.TrackerApi.InMemory

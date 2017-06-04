@@ -19,9 +19,14 @@ defmodule Tracker2x2.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
-    get "/app", AppController, :index
-    get "/app/edit", AppController, :edit
-    put "/app/update", AppController, :update
+  end
+
+  scope "/app", Tracker2x2 do
+    pipe_through :browser
+
+    get "/", AppController, :index
+    get "/edit", AppController, :edit
+    put "/update", AppController, :update
   end
 
   scope "/auth", Tracker2x2 do
@@ -36,6 +41,7 @@ defmodule Tracker2x2.Router do
     pipe_through :api
 
     get "/", ApiController, :test
+    get "/:project_id/epics", ApiController, :epics
   end
 
   # Other scopes may use custom stacks.
