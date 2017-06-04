@@ -38,6 +38,15 @@ defmodule Tracker2x2.ApiControllerTest do
     assert response(conn, 401) == "unauthorized"
   end
 
+  test "when both the token and user_id are invalid returns a 401", %{conn: conn} do
+    conn =
+      conn
+      |> put_req_header("token", Phoenix.Token.sign(Tracker2x2.Endpoint, System.get_env("APP_SALT"), "Maor"))
+      |> get("/api", %{"user_id" => "Maor"})
+
+      assert response(conn, 401) == "unauthorized"
+  end
+
   test "when the user_id does not match the user_id in the token returns a 401", %{conn: conn} do
     no_token_user_id = no_token_user()
     token_user_id = token_user()
