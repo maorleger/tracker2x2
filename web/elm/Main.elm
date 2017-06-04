@@ -146,7 +146,7 @@ update msg model =
                 { model | settings = { settings | label = value } } ! []
 
         FetchEpics ->
-            model ! [ Http.send EpicsResponse (Request.getAvailableLabels model.settings) ]
+            model ! [ Http.send EpicsResponse (Request.getEpics model.settings) ]
 
         EpicsResponse result ->
             case result of

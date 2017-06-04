@@ -38,11 +38,6 @@ storyDecoder board item =
             (Decode.field "id" Decode.int)
 
 
-labelsDecoder : Decode.Decoder (List String)
-labelsDecoder =
-    (Decode.list labelDecoder)
-
-
-labelDecoder : Decode.Decoder String
-labelDecoder =
-    Decode.at [ "label", "name" ] Decode.string
+epicsDecoder : Decode.Decoder (List String)
+epicsDecoder =
+    Decode.at [ "epics" ] <| (Decode.list Decode.string)

@@ -10,21 +10,21 @@ token =
     "SomeToken"
 
 
-getAvailableLabels : RequestParams -> Http.Request (List String)
-getAvailableLabels { projectId, label } =
+getEpics : RequestParams -> Http.Request (List String)
+getEpics { projectId, label, token, userId } =
     let
         epicsUrl =
-            "https://www.pivotaltracker.com/services/v5/projects/" ++ projectId ++ "/epics"
+          "http://localhost:4000/api/" ++ projectId ++ "/epics?user_id=" ++ toString userId
     in
         Http.request
             { method = "GET"
             , headers =
                 [ Http.header "Content-Type" "application/json"
-                , Http.header "X-TrackerToken" token
+                , Http.header "token" token
                 ]
             , url = epicsUrl
             , body = Http.emptyBody
-            , expect = Http.expectJson labelsDecoder
+            , expect = Http.expectJson epicsDecoder
             , timeout = Nothing
             , withCredentials = False
             }
