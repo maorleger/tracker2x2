@@ -17,8 +17,12 @@ defmodule Tracker2x2.TrackerApi.InMemory do
         "kind" => "error"}}
   end
 
-  def get_epics(_project_id, _tracker_token) do
-    {:ok, ["Epic1", "Epic2", "Epic3"]}
+  def get_epics(project_id, tracker_token) do
+    if project_id == "123" do
+      {:ok, ["Epic1", "Epic2", "Epic3"]}
+    else
+      get_epics(nil, tracker_token)
+    end
   end
 
 end

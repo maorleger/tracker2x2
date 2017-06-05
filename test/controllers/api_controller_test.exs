@@ -77,9 +77,19 @@ defmodule Tracker2x2.ApiControllerTest do
     conn =
       conn
       |> put_req_header("token", gen_token(token_user_id))
-      |> get("/api/1987/epics", %{"user_id" => token_user_id})
+      |> get("/api/123/epics", %{"user_id" => token_user_id})
 
     assert json_response(conn, 200) == %{"epics" => ["Epic1", "Epic2", "Epic3"]}
+  end
+
+  test "getEpics returns a 400 when the server comes back with not found", %{conn: conn} do
+    token_user_id = token_user()
+    conn =
+      conn
+      |> put_req_header("token", gen_token(token_user_id))
+      |> get("/api/9999/epics", %{"user_id" => token_user_id})
+
+    assert response(conn, 400) =~ "The object you tried to access could not be found."
   end
 
   def token_user do

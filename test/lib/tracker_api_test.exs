@@ -4,7 +4,7 @@ defmodule Tracker2x2.TrackerApiTest do
   @tracker_api Application.get_env(:tracker2x2, :tracker_api)
 
   test "happy path" do
-    assert @tracker_api.get_epics(123, "token") == {:ok, ["Epic1", "Epic2", "Epic3"]}
+    assert @tracker_api.get_epics("123", "token") == {:ok, ["Epic1", "Epic2", "Epic3"]}
   end
 
   test "Unfound project" do
@@ -15,7 +15,7 @@ defmodule Tracker2x2.TrackerApiTest do
   end
 
   test "Invalid tracker token" do
-    assert @tracker_api.get_epics(123, nil) == {:error,
+    assert @tracker_api.get_epics("123", nil) == {:error,
       %{"code" => "invalid_authentication",
         "error" => "Invalid authentication credentials were presented.",
         "kind" => "error"}}

@@ -9,8 +9,13 @@ defmodule Tracker2x2.ApiController do
   end
 
   def epics(conn, %{"project_id" => project_id}) do
-    {:ok, epics} = @tracker_api.get_epics(project_id, conn.assigns.tracker_token)
-    render(conn, "epics.json", %{epics: epics})
+    case @tracker_api.get_epics(project_id, conn.assigns.tracker_token) do
+      {:ok, epics} ->
+        render(conn, "epics.json", %{epics: epics})
+      {:error, %{"error" => error}} ->
+        conn
+        |> send_resp(400, error)
+    end
   end
 
   defp authenticate(conn, _opts) do
