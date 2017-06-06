@@ -9,6 +9,8 @@ defmodule Tracker2x2.TrackerApi.HTTPClient do
     response = HTTPotion.get epics_url, [headers: [Accepts: "application/json", "X-TrackerToken": tracker_token]]
 
     process_response(response, fn(response_body) ->
+      build_map = fn(labels) -> Map.put(%{}, :epics, labels) end
+
       response_body
       |> Poison.decode!
       |> Enum.map(fn(item) ->
@@ -16,6 +18,7 @@ defmodule Tracker2x2.TrackerApi.HTTPClient do
         |> Map.get("label")
         |> Map.get("name")
       end)
+      |> build_map.()
     end)
   end
 
@@ -23,8 +26,8 @@ defmodule Tracker2x2.TrackerApi.HTTPClient do
     case response.status_code do
       200 ->
         {:ok, callback.(response.body)}
-      _ ->
-        {:error, Poison.decode!(response.body)}
+      code ->
+        {:error, %{status_code: code, response_body: Poison.decode!(response.body)}}
     end
   end
 end

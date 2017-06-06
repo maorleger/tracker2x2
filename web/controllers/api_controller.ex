@@ -10,11 +10,12 @@ defmodule Tracker2x2.ApiController do
 
   def epics(conn, %{"project_id" => project_id}) do
     case @tracker_api.get_epics(project_id, conn.assigns.tracker_token) do
-      {:ok, epics} ->
+      {:ok, %{epics: epics}} ->
         render(conn, "epics.json", %{epics: epics})
-      {:error, %{"error" => error}} ->
+      {:error, %{status_code: status_code, response_body: %{"error" => error}} = tracker_error} ->
         conn
-        |> send_resp(400, error)
+        |> put_resp_header("content-type", "application/json; charset=utf-8")
+        |> send_resp(status_code, Poison.encode!(%{"tracker_error" => error}))
     end
   end
 

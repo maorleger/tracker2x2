@@ -89,7 +89,8 @@ defmodule Tracker2x2.ApiControllerTest do
       |> put_req_header("token", gen_token(token_user_id))
       |> get("/api/9999/epics", %{"user_id" => token_user_id})
 
-    assert response(conn, 400) =~ "The object you tried to access could not be found."
+    response = json_response(conn, 400)
+    assert response["tracker_error"] =~ "The object you tried to access could not be found."
   end
 
   def token_user do
