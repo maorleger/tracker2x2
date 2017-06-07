@@ -62,7 +62,7 @@ defmodule Tracker2x2.ApiControllerTest do
   test "all endpoints return a 404 when unable to find the tracker token", %{conn: conn} do
     no_token_user_id = no_token_user()
     token = gen_token(no_token_user_id)
-    Enum.each(["", "/1987/epics"], fn(path) -> 
+    Enum.each(["", "/1987/epics", "/1987/stories?epic=blah"], fn(path) -> 
       conn =
         conn
         |> put_req_header("token", token)
@@ -82,7 +82,7 @@ defmodule Tracker2x2.ApiControllerTest do
     assert json_response(conn, 200) == %{"epics" => ["Epic1", "Epic2", "Epic3"]}
   end
 
-  test "getEpics returns a 400 when the server comes back with not found", %{conn: conn} do
+  test "getEpics returns the server error", %{conn: conn} do
     token_user_id = token_user()
     conn =
       conn
@@ -107,6 +107,18 @@ defmodule Tracker2x2.ApiControllerTest do
       %{"id" => "2", "name" => "With description", "description" => "I have it!"},
       %{"id" => "3", "name" => "Some other story", "description" => nil},
     ]}
+  end
+
+  test "getStories returns the server error", %{conn: conn} do
+    token_user_id = token_user()
+    conn =
+      conn
+      |> put_req_header("token", gen_token(token_user_id))
+      |> get("/api/999/stories?epic=Epic1", %{"user_id" => token_user_id})
+
+    response = json_response(conn, 400)
+    assert response["error"] =~ "The object you tried to access could not be found."
+    assert response["code"] == "unfound_resource"
   end
 
   def token_user do

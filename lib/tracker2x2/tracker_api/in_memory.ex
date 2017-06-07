@@ -19,18 +19,26 @@ defmodule Tracker2x2.TrackerApi.InMemory do
 
   def get_epics(project_id, tracker_token) do
     if project_id == "123" do
-      {:ok, %{epics: ["Epic1", "Epic2", "Epic3"]}}
+      {:ok, %{response_body: ["Epic1", "Epic2", "Epic3"]}}
     else
       get_epics(nil, tracker_token)
     end
   end
 
+  def get_stories(nil, _epic, tracker_token) do
+    get_epics(nil, tracker_token)
+  end
+
   def get_stories(project_id, epic, tracker_token) do
-    {:ok, %{stories: [
-      %{id: "1", name: "Must do the things", description: nil},
-      %{id: "2", name: "With description", description: "I have it!"},
-      %{id: "3", name: "Some other story", description: nil}
-    ]}}
+    if project_id == "123" do
+      {:ok, %{response_body: [
+        %{id: "1", name: "Must do the things", description: nil},
+        %{id: "2", name: "With description", description: "I have it!"},
+        %{id: "3", name: "Some other story", description: nil}
+      ]}}
+    else
+      get_stories(nil, epic, tracker_token)
+    end
   end
 
 end
