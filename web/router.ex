@@ -42,6 +42,7 @@ defmodule Tracker2x2.Router do
 
     get "/", ApiController, :test
     get "/:project_id/epics", ApiController, :epics
+    get "/:project_id/stories", ApiController, :stories
   end
 
   # Other scopes may use custom stacks.

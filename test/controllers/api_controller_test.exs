@@ -94,6 +94,16 @@ defmodule Tracker2x2.ApiControllerTest do
     assert response["code"] == "unfound_resource"
   end
 
+  test "getStories endpoint works", %{conn: conn} do
+    token_user_id = token_user()
+    conn =
+      conn
+      |> put_req_header("token", gen_token(token_user_id))
+      |> get("/api/123/stories?epic=Epic1", %{"user_id" => token_user_id})
+
+    json_response(conn, 200)
+  end
+
   def token_user do
     Tracker2x2.Repo.get_by(Tracker2x2.User, email: "has_token@example.com").id
   end

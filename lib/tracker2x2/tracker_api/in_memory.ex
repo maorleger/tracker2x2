@@ -25,4 +25,8 @@ defmodule Tracker2x2.TrackerApi.InMemory do
     end
   end
 
+  def get_stories(project_id, epic, tracker_token) do
+    {:ok, %{}}
+  end
+
 end

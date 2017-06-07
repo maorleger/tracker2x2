@@ -9,6 +9,10 @@ defmodule Tracker2x2.ApiView do
     %{"epics" => epics}
   end
 
+  def render("stories.json", %{stories: stories}) do
+    %{"stories" => stories}
+  end
+
   def render("error.json", %{payload: payload}) do
     payload
   end

@@ -19,6 +19,11 @@ defmodule Tracker2x2.ApiController do
     end
   end
 
+  def stories(conn, %{"project_id" => project_id, "epic" => epic}) do
+    {:ok, stories} = @tracker_api.get_stories(project_id, epic, conn.assigns.tracker_token)
+    render(conn, "stories.json", %{stories: stories})
+  end
+
   defp authenticate(conn, _opts) do
     case conn.assigns.tracker_token do
       nil ->
