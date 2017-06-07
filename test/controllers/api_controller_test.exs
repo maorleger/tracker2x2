@@ -101,7 +101,12 @@ defmodule Tracker2x2.ApiControllerTest do
       |> put_req_header("token", gen_token(token_user_id))
       |> get("/api/123/stories?epic=Epic1", %{"user_id" => token_user_id})
 
-    json_response(conn, 200)
+    response = json_response(conn, 200)
+    assert response == %{"stories" => [
+      %{"id" => "1", "name" => "Must do the things", "description" => nil},
+      %{"id" => "2", "name" => "With description", "description" => "I have it!"},
+      %{"id" => "3", "name" => "Some other story", "description" => nil},
+    ]}
   end
 
   def token_user do

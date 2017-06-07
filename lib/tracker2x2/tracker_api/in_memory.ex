@@ -26,7 +26,11 @@ defmodule Tracker2x2.TrackerApi.InMemory do
   end
 
   def get_stories(project_id, epic, tracker_token) do
-    {:ok, %{}}
+    {:ok, %{stories: [
+      %{id: "1", name: "Must do the things", description: nil},
+      %{id: "2", name: "With description", description: "I have it!"},
+      %{id: "3", name: "Some other story", description: nil}
+    ]}}
   end
 
 end
