@@ -180,3 +180,7 @@ body {
 	transition: all 0.2s ease;
 }
 
+/* Override bootstrap styles */
+.container {
+  max-width: 100%;
+}

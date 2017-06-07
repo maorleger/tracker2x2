@@ -154,7 +154,7 @@ update msg model =
                     { model | error = Just <| toString error } ! []
 
                 Ok epicLabels ->
-                    { model | epicLabels = epicLabels } ! []
+                    { model | epicLabels = epicLabels, error = Nothing } ! []
 
         ChangeEpic newEpicLabel ->
             let
@@ -269,6 +269,14 @@ view model =
                     ]
                 ]
             ]
+
+        errorRenderer =
+            case model.error of
+                Nothing ->
+                    div [] []
+
+                Just error ->
+                    div [ class "error" ] [ text <| toString error ]
     in
         div [ class "container" ]
             [ div [ class "info" ] <|
@@ -296,6 +304,7 @@ view model =
                 , div [ class "board__axis board__axis--x" ] []
                 ]
                     ++ List.map (itemView model.axisLock model.drag) model.stories
+                    ++ [ errorRenderer ]
             ]
 
 
