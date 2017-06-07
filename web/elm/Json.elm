@@ -11,7 +11,8 @@ import Types exposing (..)
 
 storiesDecoder : Size -> Size -> Decode.Decoder (List Story)
 storiesDecoder board item =
-    (Decode.list (storyDecoder board item))
+    Decode.at [ "stories" ] <|
+        (Decode.list (storyDecoder board item))
 
 
 storyDecoder : Size -> Size -> Decode.Decoder Story

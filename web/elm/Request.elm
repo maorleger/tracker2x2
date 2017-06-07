@@ -14,7 +14,7 @@ getEpics : RequestParams -> Http.Request (List String)
 getEpics { projectId, label, token, userId } =
     let
         epicsUrl =
-          "http://localhost:4000/api/" ++ projectId ++ "/epics?user_id=" ++ toString userId
+            "http://localhost:4000/api/" ++ projectId ++ "/epics?user_id=" ++ toString userId
     in
         Http.request
             { method = "GET"
@@ -31,16 +31,16 @@ getEpics { projectId, label, token, userId } =
 
 
 getStories : Size -> Size -> RequestParams -> Http.Request (List Story)
-getStories board item { projectId, label } =
+getStories board item { projectId, label, token, userId } =
     let
         storiesUrl =
-            "https://www.pivotaltracker.com/services/v5/projects/" ++ projectId ++ "/stories?with_label=" ++ label ++ "&fields=name,description"
+            "http://localhost:4000/api/" ++ projectId ++ "/stories?epic=" ++ label ++ "&user_id=" ++ toString userId
     in
         Http.request
             { method = "GET"
             , headers =
                 [ Http.header "Content-Type" "application/json"
-                , Http.header "X-TrackerToken" token
+                , Http.header "token" token
                 ]
             , url = storiesUrl
             , body = Http.emptyBody
