@@ -1,10 +1,6 @@
 module Json exposing (..)
 
 import Json.Decode as Decode exposing (..)
-
-
--- import Json.Encode as Encode exposing (..)
-
 import Number.Bounded as Bounded exposing (Bounded)
 import Types exposing (..)
 

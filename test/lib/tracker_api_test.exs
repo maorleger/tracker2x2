@@ -27,5 +27,4 @@ defmodule Tracker2x2.TrackerApiTest do
     %{epics: @tracker_api.get_epics(project_id, tracker_token),
       stories: @tracker_api.get_stories(project_id, "epic", tracker_token)}
   end
-
 end
