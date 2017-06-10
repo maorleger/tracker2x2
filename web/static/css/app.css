@@ -67,7 +67,7 @@ body {
 }
 
 .board__axis--x:before {
-  content: "More urgent";
+  content: "Less urgent";
   position: absolute;
   bottom: 5px;
   left: 0;
@@ -76,7 +76,7 @@ body {
 }
 
 .board__axis--x:after {
-  content: "Less urgent";
+  content: "More urgent";
   position: absolute;
   bottom: 5px;
   right: 0;
