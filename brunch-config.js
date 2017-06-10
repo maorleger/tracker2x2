@@ -55,7 +55,7 @@ exports.config = {
     elmBrunch: {
       elmFolder: 'web/elm',
       mainModules: ['Main.elm'],
-      outputFolder: '../static/js'
+      outputFolder: '../../priv/static/js'
     },
     babel: {
       // Do not use ES6 compiler in vendor code
