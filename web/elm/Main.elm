@@ -252,20 +252,28 @@ view model =
                     ]
                 ]
             , div [ class "settings" ]
-                [ div [ class "settings__project" ]
+                [ div [ class "settings__project form-inline" ]
                     [ h3 [] [ text "Select your project" ]
                     , input
                         [ onInput <| Update ProjectId
                         , placeholder "Project Id"
+                        , class "form-control"
+                        , type_ "text"
                         ]
                         []
-                    , button [ onClick FetchEpics ] [ text "Fetch Epics" ]
+                    , button [ class "btn btn-primary", onClick FetchEpics ] [ text "Fetch Epics" ]
                     ]
                 , div [ class "settings__label" ]
                     [ h3 []
                         [ text "Select the epic"
                         ]
-                    , select [ onInput ChangeEpic ] <| List.map optionRenderer model.epicLabels
+                    , select
+                        [ class "settings__epic form-control"
+                        , onInput ChangeEpic
+                        ]
+                      <|
+                        (option [ value "" ] [ text "-- Please Select --" ])
+                            :: (List.map optionRenderer model.epicLabels)
                     ]
                 ]
             ]
