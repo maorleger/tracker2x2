@@ -11,27 +11,6 @@ defmodule Tracker2x2.AppController do
     |> render("index.html")
   end
 
-  def edit(conn, _params, current_user) do
-    changeset = User.changeset(current_user)
-
-    conn
-    |> render("edit.html", changeset: changeset)
-  end
-
-  def update(conn, %{"user" => user_params}, current_user) do
-    changeset = User.changeset(current_user, user_params)
-
-    case Repo.update(changeset) do
-      {:ok, user} ->
-        conn
-        |> assign(:current_user, user)
-        |> redirect(to: page_path(conn, :index))
-      {:error, _} ->
-        conn
-        |> render("index.html")
-    end
-  end
-
   def authenticate(conn, _opts) do
     case conn.assigns.current_user do
       nil ->

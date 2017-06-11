@@ -25,8 +25,14 @@ defmodule Tracker2x2.Router do
     pipe_through :browser
 
     get "/", AppController, :index
-    get "/edit", AppController, :edit
-    put "/update", AppController, :update
+  end
+
+  scope "/token", Tracker2x2 do
+    pipe_through :browser
+
+    get "/edit", TokenController, :edit
+    get "/create", TokenController, :create
+    put "/update", TokenController, :update
   end
 
   scope "/auth", Tracker2x2 do

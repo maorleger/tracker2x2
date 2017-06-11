@@ -1,0 +1,11 @@
+<div class="page-header">
+  <h1>Oh oh! Looks like we don't have a Pivotal Tracker token for you.</h1>
+  <p>Don't worry - if you'll set it below we'll store it for next time</p>
+</div>
+<%= form_for @changeset, app_path(@conn, :update), fn f -> %>
+  <label>
+    Token: <%= text_input f, :tracker_token %>
+  </label>
+
+  <%= submit "Submit" %>
+<% end %>
