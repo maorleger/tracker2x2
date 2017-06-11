@@ -26,6 +26,7 @@ defmodule Tracker2x2.AppControllerTest do
 
     response = html_response(conn, 200)
     assert response =~ "Sign out"
+    assert response =~ "Update your token"
   end
   
   test "it redirects without flash if the user has no token", %{conn: conn} do
