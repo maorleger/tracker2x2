@@ -1,6 +1,6 @@
 # Tracker2x2
 
-A 2 by 2 decision matrix using [https://www.pivotaltracker.com](Pivotal Tracker's) API.
+A 2 by 2 decision matrix using [Pivotal Tracker's](https://www.pivotaltracker.com) API.
 Allows a user to prioritize an epic based on urgency and importance.
 
 You'll need to sign in and provide a Pivotal Tracker token.
