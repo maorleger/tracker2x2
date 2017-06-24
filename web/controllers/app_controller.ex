@@ -13,9 +13,9 @@ defmodule Tracker2x2.AppController do
 
   def edit(conn, _params, current_user) do
     changeset = User.changeset(current_user)
-
+    template = if to_string(current_user.tracker_token) == "", do: "new.html", else: "edit.html"
     conn
-    |> render("edit.html", changeset: changeset)
+    |> render(template, changeset: changeset)
   end
 
   def update(conn, %{"user" => user_params}, current_user) do
