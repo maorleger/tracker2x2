@@ -145,8 +145,17 @@ input[type=radio].axis__input {
   color: #eee;
 }
 
+.error_details__title {
+  font-weight: bold;
+  color: white;
+}
+
 .story_details__description {
   padding: 10px;
+}
+
+.error_details {
+  color: red
 }
 
 /* Login specific styles */

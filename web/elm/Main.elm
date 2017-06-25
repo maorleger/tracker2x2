@@ -300,6 +300,17 @@ view model =
                             model.focusedStory
                             |> Maybe.withDefault [ div [ class "story_details story_details--empty" ] [] ]
                        )
+                    ++ (Maybe.map
+                            (\error ->
+                                [ div [ class "error_details" ]
+                                    [ h4 [ class "error_details__title" ] [ text "Oh oh! we got an error. See below:" ]
+                                    , text <| error
+                                    ]
+                                ]
+                            )
+                            model.error
+                            |> Maybe.withDefault []
+                       )
             , div
                 [ class "board"
                 , style
@@ -312,7 +323,6 @@ view model =
                 , div [ class "board__axis board__axis--x" ] []
                 ]
                     ++ List.map (itemView model.axisLock model.drag) model.stories
-                    ++ [ errorRenderer ]
             ]
 
 
