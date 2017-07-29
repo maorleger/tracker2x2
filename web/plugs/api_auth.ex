@@ -1,6 +1,6 @@
 defmodule Tracker2x2.ApiAuth do
   @moduledoc """
-    Provides a plug to authenticate and grab a 
+    Provides a plug to authenticate and grab a
     Pivotal Tracker token for a given user
   """
 
@@ -14,7 +14,8 @@ defmodule Tracker2x2.ApiAuth do
   end
 
   def call(%Plug.Conn{params: %{"user_id" => user_id}} = conn, _opts) do
-    with {:ok, token_user_id} <- Token.verify(conn, System.get_env("APP_SALT"), get_header_token(conn)),
+    with {:ok, token_user_id} <-
+            Token.verify(conn, System.get_env("APP_SALT"), get_header_token(conn), max_age: 86_400),
          {:ok, _} <- verify_token_user(token_user_id, user_id)
     do
       conn
